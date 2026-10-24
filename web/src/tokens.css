@@ -1,0 +1,70 @@
+@import url("https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+
+/* Landfall identity tokens · v1.0 · 5 Oct 2026 */
+:root {
+  /* Neutral workspace */
+  --lf-graphite: oklch(0.22 0.01 260);      /* #181b1f text, structure */
+  --lf-steel: oklch(0.46 0.01 260);         /* #55585e secondary text */
+  --lf-control: oklch(0.64 0.008 260);       /* #898c91 control borders */
+  --lf-rule: oklch(0.9 0.004 260);         /* #dcdee1 dividers only */
+  --lf-fog: oklch(0.955 0.004 260);         /* #eef0f3 panels, chips, land */
+  --lf-paper: oklch(0.985 0.002 250);        /* #f9fafb workspace */
+  --lf-surface: #ffffff;                     /* cards, panels */
+  /* Accent */
+  --lf-marigold: oklch(0.8 0.14 78);       /* #efb146 primary action fill */
+  --lf-marigold-hover: oklch(0.75 0.15 74);  /* #e59d23 */
+  --lf-marigold-deep: oklch(0.52 0.11 65);   /* #935a11 links, outlines */
+  --lf-arrival: oklch(0.95 0.05 85);        /* #feedc9 selected destination fill */
+  /* Knowledge states */
+  --lf-state-assumed: oklch(0.5 0.09 195);   /* #007373 */
+  --lf-state-question: oklch(0.5 0.13 300);  /* #6f4fa1 */
+  --lf-state-blocker: oklch(0.52 0.19 25);   /* #be222a */
+  --lf-state-blocker-tint: oklch(0.96 0.025 25); /* #ffece9 */
+
+  /* Type */
+  --lf-font-sans: "Schibsted Grotesk", system-ui, sans-serif;
+  --lf-font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --lf-figures: tabular-nums lining-nums; /* apply per element to money and numeric comparisons, never on body */
+  --lf-text-display: 700 40px/44px var(--lf-font-sans);   /* -0.025em */
+  --lf-text-title: 700 28px/32px var(--lf-font-sans);     /* -0.02em */
+  --lf-text-heading: 700 22px/28px var(--lf-font-sans);   /* -0.015em */
+  --lf-text-subheading: 700 16px/22px var(--lf-font-sans);
+  --lf-text-body: 400 14px/20px var(--lf-font-sans);
+  --lf-text-body-sm: 400 12.5px/18px var(--lf-font-sans);
+  --lf-text-label: 600 11.5px/16px var(--lf-font-sans);
+  --lf-text-figure-lg: 600 22px/26px var(--lf-font-sans);
+  --lf-text-provenance: 400 11px/16px var(--lf-font-mono);
+
+  /* Space (4px base) */
+  --lf-space-1: 2px;  --lf-space-2: 4px;  --lf-space-3: 8px;
+  --lf-space-4: 12px; --lf-space-5: 16px; --lf-space-6: 24px;
+  --lf-space-7: 32px; --lf-space-8: 48px; --lf-space-9: 64px;
+
+  /* Borders */
+  --lf-border-divider: 1px solid var(--lf-rule);
+  --lf-border-control: 1px solid var(--lf-control);
+  --lf-border-frame: 1.5px solid var(--lf-graphite);
+  --lf-border-selected: 2px solid var(--lf-marigold-deep);
+  --lf-focus: 2px solid var(--lf-graphite);  /* offset 2px */
+  --lf-focus-on-dark: 2px solid #ffffff;      /* offset 2px */
+
+  /* Radii */
+  --lf-radius-xs: 2px;   /* blocker squares */
+  --lf-radius-sm: 4px;   /* state rows, tags */
+  --lf-radius-md: 6px;   /* buttons, inputs, cards */
+  --lf-radius-lg: 8px;   /* panels, frames */
+  --lf-radius-pill: 999px; /* chips, Needs you */
+
+  /* Elevation: borders first; shadows only for floating layers */
+  --lf-elevation-0: none;
+  --lf-elevation-1: 0 2px 8px oklch(0.22 0.01 260 / 0.12);  /* menus, map labels */
+  --lf-elevation-2: 0 12px 32px oklch(0.22 0.01 260 / 0.18); /* dialogs, notices */
+}
+
+/* Letter-spacing companions for the type tokens */
+:root {
+  --lf-track-display: -0.025em;
+  --lf-track-title: -0.02em;
+  --lf-track-heading: -0.015em;
+  --lf-track-wordmark: -0.035em;
+}

@@ -1,0 +1,332 @@
+{
+ "reading": [
+  {
+   "key": "open",
+   "label": "Opening tidewell.example",
+   "status": "DONE",
+   "detail": "tidewell.example \u00b7 6 links on the homepage"
+  },
+  {
+   "key": "products",
+   "label": "Reading products",
+   "status": "DONE",
+   "detail": "/shop/"
+  },
+  {
+   "key": "about",
+   "label": "Reading positioning and about pages",
+   "status": "DONE",
+   "detail": "/, /news/"
+  },
+  {
+   "key": "stockists",
+   "label": "Reading stockists and shipping",
+   "status": "DONE",
+   "detail": "/stockists/, /faq/"
+  },
+  {
+   "key": "check",
+   "label": "Checking each quote against its page",
+   "status": "DONE",
+   "detail": "4 of 6 quotes support their facts"
+  },
+  {
+   "key": "summary",
+   "label": "Summarising what we know",
+   "status": "DONE",
+   "detail": "6 facts \u00b7 3 interpretations \u00b7 4 unknowns"
+  }
+ ],
+ "brief": {
+  "id": "brief_prj_f1a0dad851304ac1",
+  "version": 2,
+  "brand_name": "Tidewell",
+  "route": "site",
+  "facts": [
+   {
+    "id": "cla_ac68c40d619e41fc",
+    "label": "What you sell",
+    "value": "Sparkling cold-brewed tea in four flavors: Black Tea and Lemon, Green Tea and Yuzu, Hibiscus and Berry, and Oolong and Peach, all in 12oz cans.",
+    "state": "SUPPORTED",
+    "vc": "F",
+    "basis": null,
+    "reason": "The quote directly lists the four flavors and specifies that they are all in 12oz cans, matching the claim.",
+    "quote": "Four flavours, all in 12oz cans: Black Tea and Lemon, Green Tea and Yuzu, Hibiscus and Berry, and Oolong and Peach.",
+    "source": {
+     "id": "src_b77f8cfbe1d2d664",
+     "url": "http://tidewell.example/",
+     "fetched_at": "2026-10-23T23:08:43+00:00"
+    },
+    "corrected": false
+   },
+   {
+    "id": "cla_75626fba17dd4408",
+    "label": "Where you sell",
+    "value": "Available in 41 neighborhood shops across Portland and Seattle, including independent grocers, coffee shops, and bottle shops.",
+    "state": "TO_CHECK",
+    "vc": "F",
+    "basis": null,
+    "reason": "The quote confirms the number of shops and locations (Portland and Seattle) but does not specify the types of shops (independent grocers, coffee shops, bottle shops).",
+    "quote": "You can find Tidewell at 41 neighbourhood shops across Portland and Seattle.",
+    "source": {
+     "id": "src_7fbb0e25b28b0444",
+     "url": "http://tidewell.example/stockists/",
+     "fetched_at": "2026-10-23T23:08:45+00:00"
+    },
+    "corrected": false
+   },
+   {
+    "id": "cla_b4afda632fae42d9",
+    "label": "Shipping",
+    "value": "Ships within the US only; no international shipping at this time.",
+    "state": "SUPPORTED",
+    "vc": "F",
+    "basis": null,
+    "reason": "The quote explicitly states that they ship within the US only and do not ship internationally yet, which directly supports the claim.",
+    "quote": "We ship within the US only. We do not ship internationally yet.",
+    "source": {
+     "id": "src_41b834e8fdfceba0",
+     "url": "http://tidewell.example/faq/",
+     "fetched_at": "2026-10-23T23:08:45+00:00"
+    },
+    "corrected": false
+   },
+   {
+    "id": "cla_042bd384503f470c",
+    "label": "Community",
+    "value": "Sponsors two Portland run clubs: the Alberta Arts Runners and the Sellwood Striders, providing a cooler at their Saturday morning runs finish line.",
+    "state": "TO_CHECK",
+    "vc": "F",
+    "basis": null,
+    "reason": "The quote confirms sponsorship of the two run clubs but does not mention providing a cooler at the finish line of their Saturday morning runs.",
+    "quote": "This season Tidewell sponsors two Portland run clubs, the Alberta Arts Runners and the Sellwood Striders.",
+    "source": {
+     "id": "src_d8bb834b40277772",
+     "url": "http://tidewell.example/news/",
+     "fetched_at": "2026-10-23T23:08:45+00:00"
+    },
+    "corrected": false
+   },
+   {
+    "id": "cla_2d0ad976b30245a6",
+    "label": "Price points",
+    "value": "A case of 12 cans costs $36; a mixed case of 24 cans costs $68.",
+    "state": "SUPPORTED",
+    "vc": "F",
+    "basis": null,
+    "reason": "The quote exactly matches the pricing information given in the claim for both a case of 12 cans and a mixed case of 24 cans.",
+    "quote": "A case of 12 cans is $36. A mixed case of 24 cans is $68.",
+    "source": {
+     "id": "src_800fedc1e72e6237",
+     "url": "http://tidewell.example/shop/",
+     "fetched_at": "2026-10-23T23:08:45+00:00"
+    },
+    "corrected": false
+   },
+   {
+    "id": "cla_c7a9b334e8494db2",
+    "label": "Founded",
+    "value": "Started on a single stall at a neighborhood market in Portland.",
+    "state": "SUPPORTED",
+    "vc": "F",
+    "basis": null,
+    "reason": "The quote directly states that they started on a single stall at a neighborhood market, which supports the claim.",
+    "quote": "We started on a single stall at a neighbourhood market and now you can find us in shops across Portland and Seattle.",
+    "source": {
+     "id": "src_b77f8cfbe1d2d664",
+     "url": "http://tidewell.example/",
+     "fetched_at": "2026-10-23T23:08:43+00:00"
+    },
+    "corrected": false
+   }
+  ],
+  "interpretation": [
+   {
+    "id": "cla_6f1eeb0e3cec4fcb",
+    "label": "Home market",
+    "value": "Portland, Oregon, US",
+    "state": "STATED",
+    "vc": "U",
+    "basis": null,
+    "reason": null,
+    "quote": null,
+    "source": null,
+    "corrected": true
+   },
+   {
+    "id": "cla_d76c501cae9d4f5c",
+    "label": "Positioning",
+    "value": "Premium, natural sparkling cold-brewed tea without added syrups or sweeteners",
+    "state": "INFERRED",
+    "vc": "I",
+    "basis": "From homepage copy: 'No syrups, no sweeteners, just tea, a little fruit and bubbles'",
+    "reason": null,
+    "quote": null,
+    "source": null,
+    "corrected": false
+   },
+   {
+    "id": "cla_4a6b1e7da47b4aa1",
+    "label": "Audience",
+    "value": "Health-conscious consumers, tea enthusiasts, and people looking for natural, additive-free beverages",
+    "state": "INFERRED",
+    "vc": "I",
+    "basis": "From product description and absence of artificial additives",
+    "reason": null,
+    "quote": null,
+    "source": null,
+    "corrected": false
+   }
+  ],
+  "unknowns": [
+   {
+    "label": "Unit cost",
+    "why_it_matters": "Needed for pricing strategy and profit margin calculations"
+   },
+   {
+    "label": "Wholesale price",
+    "why_it_matters": "Essential for potential retail partnerships and distribution agreements"
+   },
+   {
+    "label": "Production capacity",
+    "why_it_matters": "Important for scaling and fulfilling orders"
+   },
+   {
+    "label": "International shipping plans",
+    "why_it_matters": "Key for expansion strategy and global market entry"
+   }
+  ],
+  "corrections": [
+   {
+    "label": "Home market",
+    "old_claim_id": "cla_2e0e7dd8f2e24e1b",
+    "new_claim_id": "cla_6f1eeb0e3cec4fcb",
+    "at": "2026-10-23T23:08:54+00:00"
+   }
+  ],
+  "pages_read": 5,
+  "read_at": "2026-10-23T23:08:51+00:00"
+ },
+ "usage": {
+  "model_calls": 3,
+  "est_usd": 0.0057,
+  "input_tokens": 6534,
+  "output_tokens": 1279,
+  "pages_fetched": 5,
+  "pages_read": 5,
+  "replayed": false
+ },
+ "activity": [
+  {
+   "seq": 11,
+   "at": "2026-10-23T23:08:43+00:00",
+   "run_id": "run_46da5bb69e3c4279",
+   "kind": "activity",
+   "stage": "Brand",
+   "role": "Brand reader",
+   "tool": "website reader",
+   "task": "Open tidewell.example",
+   "detail": "Homepage read \u00b7 6 same-site links",
+   "status": "DONE"
+  },
+  {
+   "seq": 16,
+   "at": "2026-10-23T23:08:45+00:00",
+   "run_id": "run_46da5bb69e3c4279",
+   "kind": "activity",
+   "stage": "Brand",
+   "role": "Brand reader",
+   "tool": "website reader",
+   "task": "Read /",
+   "detail": "Sparkling cold-brewed tea \u00b7 Tidewell",
+   "status": "DONE"
+  },
+  {
+   "seq": 18,
+   "at": "2026-10-23T23:08:45+00:00",
+   "run_id": "run_46da5bb69e3c4279",
+   "kind": "activity",
+   "stage": "Brand",
+   "role": "Brand reader",
+   "tool": "website reader",
+   "task": "Read /shop/",
+   "detail": "Shop \u00b7 Tidewell",
+   "status": "DONE"
+  },
+  {
+   "seq": 20,
+   "at": "2026-10-23T23:08:45+00:00",
+   "run_id": "run_46da5bb69e3c4279",
+   "kind": "activity",
+   "stage": "Brand",
+   "role": "Brand reader",
+   "tool": "website reader",
+   "task": "Read /stockists/",
+   "detail": "Find us \u00b7 Tidewell",
+   "status": "DONE"
+  },
+  {
+   "seq": 23,
+   "at": "2026-10-23T23:08:45+00:00",
+   "run_id": "run_46da5bb69e3c4279",
+   "kind": "activity",
+   "stage": "Brand",
+   "role": "Brand reader",
+   "tool": "website reader",
+   "task": "Read /faq/",
+   "detail": "Shipping and questions \u00b7 Tidewell",
+   "status": "DONE"
+  },
+  {
+   "seq": 24,
+   "at": "2026-10-23T23:08:45+00:00",
+   "run_id": "run_46da5bb69e3c4279",
+   "kind": "activity",
+   "stage": "Brand",
+   "role": "Brand reader",
+   "tool": "website reader",
+   "task": "Read /news/",
+   "detail": "Journal \u00b7 Tidewell",
+   "status": "DONE"
+  },
+  {
+   "seq": 30,
+   "at": "2026-10-23T23:08:51+00:00",
+   "run_id": "run_46da5bb69e3c4279",
+   "kind": "activity",
+   "stage": "Brand",
+   "role": "Researcher",
+   "tool": "quote check + support check",
+   "task": "Check quotes against pages",
+   "detail": "4 supported \u00b7 2 to check",
+   "status": "DONE"
+  },
+  {
+   "seq": 32,
+   "at": "2026-10-23T23:08:51+00:00",
+   "run_id": "run_46da5bb69e3c4279",
+   "kind": "activity",
+   "stage": "Brand",
+   "role": "Brand reader",
+   "tool": "brief",
+   "task": "Summarise what we know",
+   "detail": "6 facts \u00b7 3 inferences \u00b7 4 unknowns",
+   "status": "DONE"
+  },
+  {
+   "seq": 35,
+   "at": "2026-10-23T23:08:54+00:00",
+   "run_id": null,
+   "kind": "founder",
+   "task": "Corrected home market",
+   "detail": "Portland, Oregon, USA \u2192 Portland, Oregon, US",
+   "brief_version": 2
+  }
+ ],
+ "run": {
+  "id": "run_46da5bb69e3c4279",
+  "kind": "brand_read",
+  "status": "completed",
+  "message": ""
+ }
+}

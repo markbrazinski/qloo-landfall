@@ -1,0 +1,54 @@
+# Secrets and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa*
+credentials
+.aws/
+
+# Private runtime, databases, logs, raw provider evidence
+.landfall/
+private/
+runtime/
+*.db
+*.sqlite
+*.sqlite3
+*.log
+raw-provider/
+live-captures-private/
+
+# Dependencies, environments, caches, build output
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+.next/
+coverage/
+
+# OS and editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Kept out of the repository by owner instruction (24 Oct 2026)
+design/
+docs/
+live-captures-private/
+
+# Local runtime and build output
+.landfall/
+web/dist/
+web/node_modules/
+*.db-wal
+*.db-shm
+*.lock.lck
+live-captures-private/usage-ledger.lock

@@ -1,0 +1,39 @@
+{
+ "case_id": "synthetic-tidewell-v4",
+ "label": "SYNTHETIC \u00b7 fictional Tidewell site; pages reused, reader@5 + checker@3 live",
+ "status": "synthetic public fixture",
+ "slice": 1,
+ "input": {
+  "url": "http://tidewell.example/"
+ },
+ "recorded_from_project": "prj_f659a59cb53d4f7a",
+ "recorded_at": "2026-10-24T11:29:48+00:00",
+ "model": "us.amazon.nova-2-lite-v1:0",
+ "prompt_versions": [
+  "brand_reader@5",
+  "support_check@3"
+ ],
+ "expected_semantic_outcomes": [
+  "every interpretation shows what it is inferred from",
+  "unit cost / wholesale price listed as unknown, not guessed"
+ ],
+ "replaces": "fixtures/synthetic/tidewell-brand-v3",
+ "reason": "brand_reader@5 (inferred from, with English output as a top-level rule and relevant citations only); earlier version kept unchanged",
+ "provenance": {
+  "reused_exchanges": 6,
+  "new_live_exchanges": 3,
+  "live_stages": [
+   "brand",
+   "brand_reader",
+   "support_check"
+  ],
+  "original_capture": "2026-10-24T11:28:21+00:00",
+  "v1_checksums": "89ebb242212b5e61c1ac136e6a0be2a7c7f283d03b2746f1aad6d86e6e7e0f38  case.json\n1dd0f13b0f46e018f624e3a531cb534b076885e080a5dd408bafa274f68d0b36  exchanges.jsonl\n1603f02b7e3f3141a32ed4613684a9ec8487c302d030528f80a832bde2d5add2  trace.json\n"
+ },
+ "incremental_usage": {
+  "bedrock_usd": 0.00687,
+  "bedrock_calls": 3,
+  "fetches": 0,
+  "qloo": 0
+ }
+}

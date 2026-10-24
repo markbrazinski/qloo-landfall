@@ -1,0 +1,21 @@
+{
+ "case_id": "synthetic-tidewell-v1",
+ "label": "SYNTHETIC \u00b7 fictional Tidewell site served locally; real Nova 2 Lite responses",
+ "status": "synthetic public fixture",
+ "slice": 1,
+ "input": {
+  "url": "http://tidewell.example/"
+ },
+ "recorded_from_project": "prj_f1a0dad851304ac1",
+ "recorded_at": "2026-10-23T23:08:43+00:00",
+ "model": "us.amazon.nova-2-lite-v1:0",
+ "prompt_versions": [
+  "brand_reader@3",
+  "support_check@2"
+ ],
+ "expected_semantic_outcomes": [
+  "brief opens automatically with sourced facts",
+  "unit cost / wholesale price listed as unknown, not guessed",
+  "home market interpreted as Portland, Oregon"
+ ]
+}

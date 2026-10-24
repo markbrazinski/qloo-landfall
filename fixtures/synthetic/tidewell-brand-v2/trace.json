@@ -1,0 +1,344 @@
+{
+ "reading": [
+  {
+   "key": "open",
+   "label": "Opening tidewell.example",
+   "status": "DONE",
+   "detail": "tidewell.example \u00b7 6 links on the homepage"
+  },
+  {
+   "key": "products",
+   "label": "Reading products",
+   "status": "DONE",
+   "detail": "/shop/"
+  },
+  {
+   "key": "about",
+   "label": "Reading positioning and about pages",
+   "status": "DONE",
+   "detail": "/, /news/"
+  },
+  {
+   "key": "stockists",
+   "label": "Reading stockists and shipping",
+   "status": "DONE",
+   "detail": "/stockists/, /faq/"
+  },
+  {
+   "key": "check",
+   "label": "Checking each quote against its page",
+   "status": "DONE",
+   "detail": "3 of 6 quotes support their facts"
+  },
+  {
+   "key": "summary",
+   "label": "Summarising what we know",
+   "status": "DONE",
+   "detail": "6 facts \u00b7 3 interpretations \u00b7 4 unknowns"
+  }
+ ],
+ "brief": {
+  "id": "brief_prj_96354132ea604d29",
+  "version": 1,
+  "brand_name": "Tidewell",
+  "route": "site",
+  "unknown_basis": "Not established from the pages read",
+  "facts": [
+   {
+    "id": "cla_e72c366e34674d73",
+    "label": "What you sell",
+    "value": "Sparkling cold-brewed tea in four flavors: Black Tea and Lemon, Green Tea and Yuzu, Hibiscus and Berry, and Oolong and Peach, all in 12oz cans.",
+    "state": "SUPPORTED",
+    "vc": "F",
+    "basis": null,
+    "reason": "The quote lists the four flavors and states they are in 12oz cans, matching the claim exactly.",
+    "quote": "Four flavours, all in 12oz cans: Black Tea and Lemon, Green Tea and Yuzu, Hibiscus and Berry, and Oolong and Peach.",
+    "source": {
+     "id": "src_18ee5e6df05c497b",
+     "url": "http://tidewell.example/",
+     "fetched_at": "2026-10-24T10:02:44+00:00"
+    },
+    "quote_found": true,
+    "support": "SUPPORTED",
+    "checker": "support_check@3",
+    "corrected": false
+   },
+   {
+    "id": "cla_ad6a8756b48843b8",
+    "label": "Where you sell",
+    "value": "Available in 41 neighborhood shops across Portland and Seattle, including independent grocers, coffee shops, and bottle shops.",
+    "state": "TO_CHECK",
+    "vc": "F",
+    "basis": null,
+    "reason": "The quote is on the page but does not establish this claim: The quote states the brand is available in 41 neighborhood shops across Portland and Seattle, but does not specify the types of shops (independent grocers, coffee shops, bottle shops).",
+    "quote": "You can find Tidewell at 41 neighbourhood shops across Portland and Seattle.",
+    "source": {
+     "id": "src_4a8df1c1eae6176e",
+     "url": "http://tidewell.example/stockists/",
+     "fetched_at": "2026-10-24T10:02:44+00:00"
+    },
+    "quote_found": true,
+    "support": "PARTIAL",
+    "checker": "support_check@3",
+    "corrected": false
+   },
+   {
+    "id": "cla_5f24b4392e5b410c",
+    "label": "Shipping",
+    "value": "Ships within the US only; no international shipping at this time.",
+    "state": "SUPPORTED",
+    "vc": "F",
+    "basis": null,
+    "reason": "The quote directly states that the brand ships within the US only and does not ship internationally yet, matching the claim exactly.",
+    "quote": "We ship within the US only. We do not ship internationally yet.",
+    "source": {
+     "id": "src_1b64946b6d963f1f",
+     "url": "http://tidewell.example/faq/",
+     "fetched_at": "2026-10-24T10:02:44+00:00"
+    },
+    "quote_found": true,
+    "support": "SUPPORTED",
+    "checker": "support_check@3",
+    "corrected": false
+   },
+   {
+    "id": "cla_2f996dbbdeaf4fcb",
+    "label": "Community",
+    "value": "Sponsors two Portland run clubs: the Alberta Arts Runners and the Sellwood Striders, providing a cooler at their Saturday morning runs finish line.",
+    "state": "TO_CHECK",
+    "vc": "F",
+    "basis": null,
+    "reason": "The quote is on the page but does not establish this claim: The quote confirms sponsorship of the two run clubs but does not mention providing a cooler at the finish line.",
+    "quote": "This season Tidewell sponsors two Portland run clubs, the Alberta Arts Runners and the Sellwood Striders.",
+    "source": {
+     "id": "src_5fc3258244a8d8e9",
+     "url": "http://tidewell.example/news/",
+     "fetched_at": "2026-10-24T10:02:44+00:00"
+    },
+    "quote_found": true,
+    "support": "PARTIAL",
+    "checker": "support_check@3",
+    "corrected": false
+   },
+   {
+    "id": "cla_666e421fc1fe4123",
+    "label": "Price points",
+    "value": "A case of 12 cans costs $36; a mixed case of 24 cans costs $68.",
+    "state": "SUPPORTED",
+    "vc": "F",
+    "basis": null,
+    "reason": "The quote gives the exact pricing for a case of 12 cans and a mixed case of 24 cans, matching the claim exactly.",
+    "quote": "A case of 12 cans is $36. A mixed case of 24 cans is $68.",
+    "source": {
+     "id": "src_4902c3041074c912",
+     "url": "http://tidewell.example/shop/",
+     "fetched_at": "2026-10-24T10:02:44+00:00"
+    },
+    "quote_found": true,
+    "support": "SUPPORTED",
+    "checker": "support_check@3",
+    "corrected": false
+   },
+   {
+    "id": "cla_424748aab281479b",
+    "label": "Founded",
+    "value": "Started on a single stall at a neighborhood market in Portland.",
+    "state": "TO_CHECK",
+    "vc": "F",
+    "basis": null,
+    "reason": "The quote is on the page but does not establish this claim: The quote states the brand started on a single stall at a neighborhood market but does not specify the location as Portland (though context may imply it).",
+    "quote": "We started on a single stall at a neighbourhood market and now you can find us in shops across Portland and Seattle.",
+    "source": {
+     "id": "src_18ee5e6df05c497b",
+     "url": "http://tidewell.example/",
+     "fetched_at": "2026-10-24T10:02:44+00:00"
+    },
+    "quote_found": true,
+    "support": "PARTIAL",
+    "checker": "support_check@3",
+    "corrected": false
+   }
+  ],
+  "interpretation": [
+   {
+    "id": "cla_ba3e9a06f53141c4",
+    "label": "Home market",
+    "value": "Portland, Oregon, USA",
+    "state": "INFERRED",
+    "vc": "I",
+    "basis": "From 'brewed slowly in Portland' and 'We started on a single stall at a neighbourhood market'",
+    "reason": null,
+    "quote": null,
+    "source": null,
+    "quote_found": null,
+    "support": null,
+    "checker": null,
+    "corrected": false
+   },
+   {
+    "id": "cla_ce4c4767b44643d3",
+    "label": "Positioning",
+    "value": "Premium, natural sparkling cold-brewed tea without added syrups or sweeteners",
+    "state": "INFERRED",
+    "vc": "I",
+    "basis": "From homepage copy: 'No syrups, no sweeteners, just tea, a little fruit and bubbles'",
+    "reason": null,
+    "quote": null,
+    "source": null,
+    "quote_found": null,
+    "support": null,
+    "checker": null,
+    "corrected": false
+   },
+   {
+    "id": "cla_52509a98d1d34f8e",
+    "label": "Audience",
+    "value": "Health-conscious consumers, tea enthusiasts, and people looking for natural, additive-free beverages",
+    "state": "INFERRED",
+    "vc": "I",
+    "basis": "From product description and absence of artificial additives",
+    "reason": null,
+    "quote": null,
+    "source": null,
+    "quote_found": null,
+    "support": null,
+    "checker": null,
+    "corrected": false
+   }
+  ],
+  "unknowns": [
+   {
+    "label": "Unit cost",
+    "why_it_matters": "Needed for pricing strategy and profit margin calculations"
+   },
+   {
+    "label": "Wholesale price",
+    "why_it_matters": "Essential for potential retail partnerships and distribution agreements"
+   },
+   {
+    "label": "Production capacity",
+    "why_it_matters": "Important for scaling and fulfilling orders"
+   },
+   {
+    "label": "International shipping plans",
+    "why_it_matters": "Key for expansion strategy and global market entry"
+   }
+  ],
+  "corrections": [],
+  "pages_read": 5,
+  "read_at": "2026-10-24T10:02:46+00:00"
+ },
+ "usage": {
+  "model_calls": 3,
+  "est_usd": 0.0063,
+  "input_tokens": 6741,
+  "output_tokens": 1468,
+  "pages_fetched": 5,
+  "pages_read": 5,
+  "replayed": false
+ },
+ "activity": [
+  {
+   "seq": 11,
+   "at": "2026-10-24T10:02:44+00:00",
+   "run_id": "run_2adffeb8d1664513",
+   "kind": "activity",
+   "stage": "Brand",
+   "role": "Brand reader",
+   "tool": "website reader",
+   "task": "Open tidewell.example",
+   "detail": "Homepage read \u00b7 6 same-site links",
+   "status": "DONE"
+  },
+  {
+   "seq": 16,
+   "at": "2026-10-24T10:02:44+00:00",
+   "run_id": "run_2adffeb8d1664513",
+   "kind": "activity",
+   "stage": "Brand",
+   "role": "Brand reader",
+   "tool": "website reader",
+   "task": "Read /",
+   "detail": "Sparkling cold-brewed tea \u00b7 Tidewell",
+   "status": "DONE"
+  },
+  {
+   "seq": 18,
+   "at": "2026-10-24T10:02:44+00:00",
+   "run_id": "run_2adffeb8d1664513",
+   "kind": "activity",
+   "stage": "Brand",
+   "role": "Brand reader",
+   "tool": "website reader",
+   "task": "Read /shop/",
+   "detail": "Shop \u00b7 Tidewell",
+   "status": "DONE"
+  },
+  {
+   "seq": 21,
+   "at": "2026-10-24T10:02:44+00:00",
+   "run_id": "run_2adffeb8d1664513",
+   "kind": "activity",
+   "stage": "Brand",
+   "role": "Brand reader",
+   "tool": "website reader",
+   "task": "Read /faq/",
+   "detail": "Shipping and questions \u00b7 Tidewell",
+   "status": "DONE"
+  },
+  {
+   "seq": 22,
+   "at": "2026-10-24T10:02:44+00:00",
+   "run_id": "run_2adffeb8d1664513",
+   "kind": "activity",
+   "stage": "Brand",
+   "role": "Brand reader",
+   "tool": "website reader",
+   "task": "Read /stockists/",
+   "detail": "Find us \u00b7 Tidewell",
+   "status": "DONE"
+  },
+  {
+   "seq": 24,
+   "at": "2026-10-24T10:02:44+00:00",
+   "run_id": "run_2adffeb8d1664513",
+   "kind": "activity",
+   "stage": "Brand",
+   "role": "Brand reader",
+   "tool": "website reader",
+   "task": "Read /news/",
+   "detail": "Journal \u00b7 Tidewell",
+   "status": "DONE"
+  },
+  {
+   "seq": 30,
+   "at": "2026-10-24T10:02:46+00:00",
+   "run_id": "run_2adffeb8d1664513",
+   "kind": "activity",
+   "stage": "Brand",
+   "role": "Researcher",
+   "tool": "quote check + support check",
+   "task": "Check quotes against pages",
+   "detail": "3 supported \u00b7 3 to check",
+   "status": "DONE"
+  },
+  {
+   "seq": 32,
+   "at": "2026-10-24T10:02:46+00:00",
+   "run_id": "run_2adffeb8d1664513",
+   "kind": "activity",
+   "stage": "Brand",
+   "role": "Brand reader",
+   "tool": "brief",
+   "task": "Summarise what we know",
+   "detail": "6 facts \u00b7 3 inferences \u00b7 4 unknowns",
+   "status": "DONE"
+  }
+ ],
+ "run": {
+  "id": "run_2adffeb8d1664513",
+  "kind": "brand_read",
+  "status": "completed",
+  "message": ""
+ }
+}
