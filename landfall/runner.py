@@ -69,6 +69,9 @@ def cassette_for(project_id: str) -> Cassette:
     p = db.q("SELECT mode, demo_case FROM projects WHERE id=?", project_id)[0]
     if p["mode"] == "replay":
         return Cassette("replay", replay_dirs=[Path(d) for d in p["demo_case"].split(",")])
+    if config.REPLAY_CASES:  # accepted upstream cases replay; only LIVE_STAGES may go live, and those are recorded
+        return Cassette("replay", config.PRIVATE / "runs" / project_id if config.LIVE_STAGES else None,
+                        replay_dirs=config.REPLAY_CASES, live_stages=config.LIVE_STAGES)
     mode = config.PROVIDER_MODE
     return Cassette(mode, config.PRIVATE / "runs" / project_id if mode == "record" else None)
 
@@ -113,8 +116,8 @@ def _execute(run_id: str):
     db.x("UPDATE runs SET status='running' WHERE id=?", run_id)
     run.emit("run", {"status": "running", "run_kind": run.kind})
     try:
-        HANDLERS[run.kind](run)
-        _finish(run, "completed")
+        ended = HANDLERS[run.kind](run)  # a handler may end its run (status, message), e.g. ("partial", "…")
+        _finish(run, *(ended or ("completed",)))
     except Cancelled:
         _finish(run, "cancelled", "Stopped by you. Completed work is kept.")
     except NeedsInput as e:

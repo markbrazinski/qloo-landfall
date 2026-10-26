@@ -13,7 +13,7 @@ from .nova import make_model
 from .runner import HANDLERS, NeedsInput, Run
 
 PROMPT_VERSION = "brand_reader@5"
-CHECKER_VERSION = "support_check@3"
+CHECKER_VERSION = "support_check@4"
 CHECKER = ("You check whether a verbatim quote from a web page supports a claim exactly as it is shown to a founder. "
            "Each claim has a field, a label and a value, and together they are the claim: field 'founded', label "
            "'Founded', value '2009' means 'the brand was founded in 2009'. First restate that full claim in "
@@ -22,10 +22,13 @@ CHECKER = ("You check whether a verbatim quote from a web page supports a claim 
            "the quote (for example 'our cans are sold in Seattle' does not state 'the brand is based in Seattle'). "
            "Dates: a year in which something was done (selling, making, developing, shipping since a year) is not a "
            "founding date; only a quote saying the company was founded, established, started or launched then "
-           "supports one. NOT_SUPPORTED: the quote does not support the claim. Judge only from the quote, never from "
-           "what you know about the brand.")
+           "supports one. NOT_SUPPORTED: the quote does not support the claim. Also list in unsupported_parts every "
+           "part of the displayed claim the quote does not itself state, including qualifiers, hedges and extra "
+           "clauses (for example 'with other locations not specified'); leave it empty only when the quote states "
+           "the whole claim. Judge only from the quote, never from what you know about the brand.")
 MAX_PAGES = 8
 PAGE_CHARS = 7000
+THIN_LINKS = 5  # a homepage with fewer same-site links than this also offers its sitemap and its own off-site links
 
 ROWS = [("open", "Opening the website"), ("products", "Reading products"),
         ("about", "Reading positioning and about pages"), ("stockists", "Reading stockists and shipping"),
@@ -74,6 +77,8 @@ class BriefDraft(BaseModel):
 class Verdict(BaseModel):
     claim_id: str
     claim_as_read: str = Field(description="The full claim restated from its field, label and value")
+    unsupported_parts: list[str] = Field(default_factory=list,
+                                         description="Parts of the displayed claim the quote does not state")
     verdict: Literal["SUPPORTED", "PARTIAL", "NOT_SUPPORTED"]
     reason: str
 
@@ -108,6 +113,18 @@ Rules:
 - Never invent a URL, number, place or partner. If something is not on the pages you read, leave it out."""
 
 
+# A fact row states what a page says. A row that carries its own hedge ("with potential other locations not
+# specified") is a compound of a fact and an uncertainty, so it cannot be SOURCE as a whole (review closure, blocker 1).
+# ponytail: English phrase list; misses novel hedges. Upgrade path: checker splits rows into atomic parts, each judged.
+_HEDGE = re.compile(r"\b(potential(ly)?|possibl[ey]|probabl[ey]|likely|perhaps|presumably|unclear|uncertain|"
+                    r"unspecified|not specified|not stated|not known|unknown|seems? to|appears? to|might)\b", re.I)
+
+
+def _hedge(value: str) -> str | None:
+    m = _HEDGE.search(value or "")
+    return m.group(0) if m else None
+
+
 def _label(c: dict) -> str:
     """The row label the founder sees; the checker judges exactly this."""
     return FACT_LABELS.get(c["field"]) if c["field"] != "other" else c.get("label") or FACT_LABELS["other"]
@@ -128,8 +145,10 @@ def quote_found(quote: str, text: str) -> bool:
 
 def _usage_sink(run: Run):
     def sink(u: dict):
-        db.x("INSERT INTO usage VALUES(?,?,?,?,?,?,?,?,?,?)", run.project_id, run.id, db.now(), "bedrock", u["stage"],
-             int(u["replayed"]), u["input_tokens"], u["output_tokens"], u["est_usd"], u["status"])
+        db.x("INSERT INTO usage(project_id, run_id, at, provider, stage, replayed, input_tokens, output_tokens, est_usd, "
+             "status, origin) VALUES(?,?,?,?,?,?,?,?,?,?,?)", run.project_id, run.id, db.now(), "bedrock", u["stage"],
+             int(u["replayed"]), u["input_tokens"], u["output_tokens"], u["est_usd"], u["status"],
+             "replay" if u["replayed"] else "live")
     return sink
 
 
@@ -137,8 +156,9 @@ def _row(run: Run, row: str, status: str, detail: str = ""):
     run.emit("reading", {"row": row, "status": status, "detail": detail})
 
 
-def _activity(run: Run, task: str, tool_name: str, detail: str, status: str = "DONE", role: str = "Brand reader"):
-    run.emit("activity", {"stage": "Brand", "role": role, "tool": tool_name, "task": task, "detail": detail, "status": status})
+def _activity(run: Run, task: str, tool_name: str, detail: str, status: str = "DONE", role: str = "Brand reader",
+              stage: str = "Brand"):
+    run.emit("activity", {"stage": stage, "role": role, "tool": tool_name, "task": task, "detail": detail, "status": status})
 
 
 def _store_source(run: Run, url: str, page: dict, extracted: dict) -> dict:
@@ -170,6 +190,12 @@ def read_page(run: Run, url: str) -> dict:
                 "links": [], "status": 200}
     page = fetch.get(url, run.cassette, "brand")
     ex = fetch.extract(page) if page.get("status") == 200 else {"title": "", "text": "", "links": []}
+    if page.get("status") == 200 and fetch.needs_render(ex):  # a JavaScript shell: read it as a browser would
+        shown = fetch.render(url, run.cassette, "brand")
+        if shown.get("status") == 200 and len((rx := fetch.extract(shown))["text"]) > len(ex["text"]):
+            page, ex = shown, rx
+            _activity(run, f"Render {urlsplit(url).path or '/'}", "website reader",
+                      "The page needed JavaScript; read it as a browser shows it")
     src = _store_source(run, fetch.check_url(url), page, ex)
     return {**src, "status": page.get("status"), "error": page.get("error")}
 
@@ -191,12 +217,14 @@ def brand_read(run: Run):
             last = read_page(run, url)
             if last.get("status") == 200 and len(last.get("text", "")) >= 150:
                 return {"ok": True, "source_id": last["id"], "title": last["title"], "links": last.get("links", []),
-                        "site": fetch.site_of(last["final_url"])}
+                        "site": fetch.site_of(last["final_url"]), "first_title": last.get("first_title"),
+                        "outbound": last.get("outbound", [])}
             wait = last.get("retry_after")
             if attempt == 1 and last.get("status") in (429, 503) and wait and wait.isdigit() and int(wait) <= 30:
                 run.cancel.wait(int(wait))  # honour a short Retry-After; longer waits are reported, not slept through
         err = last.get("error") or ""
-        why = ("That address doesn't exist (no DNS record)" if err == "NoSuchHost"
+        why = ("We couldn't look up that address: DNS gave no answer. The site may not exist, or its DNS may be "
+               "down right now" if err == "NoSuchHost"
                else "The site didn't respond" if "Connect" in err else "Timed out" if "Timeout" in err
                else f"The address can't be read ({err.removeprefix('blocked: ')})" if err.startswith("blocked") else err
                or ("The site is turning away automated readers (HTTP 429, asked us to wait "
@@ -220,6 +248,13 @@ def brand_read(run: Run):
     run.check()
     claims = run.step("check", lambda: _check(run, draft))
     run.step("summary", lambda: _assemble(run, draft, claims, route="site"))
+    _brief_ready(run)
+
+
+def _brief_ready(run: Run):
+    """Outside any step, so a resumed run still hands over: a no-match identity now gets its profile proposed."""
+    from . import identity  # identity builds on this module
+    identity.brief_ready(run.project_id)
 
 
 def _run_reader(run: Run, url: str, sites: set[str], home: dict) -> dict:
@@ -228,11 +263,15 @@ def _run_reader(run: Run, url: str, sites: set[str], home: dict) -> dict:
     for key in purposes:
         _row(run, key, "RUNNING")
 
+    thin = len(home["links"]) < THIN_LINKS
+    more = _sitemap_pages(run, url, sites, set(home["links"])) if thin else []
+    linked = set(home.get("outbound") or []) if thin else set()  # the brand's own links to pages on other sites
+
     @tool
     def fetch_page(page_url: str, purpose: Literal["products", "about", "stockists", "shipping", "community", "other"]) -> str:
         """Read one page of the brand's own website. purpose says why you are reading it."""
         run.check()
-        if not any(fetch.same_site(page_url, s) for s in sites):  # the entered domain and where it redirects
+        if not any(fetch.same_site(page_url, s) for s in sites) and _norm_url(page_url) not in linked:
             return "Not read: only pages on the brand's own site can be read here."
         if len(pages) >= MAX_PAGES and page_url not in pages:
             return f"Not read: the {MAX_PAGES}-page limit is reached. Work with the pages you have."
@@ -258,8 +297,7 @@ def _run_reader(run: Run, url: str, sites: set[str], home: dict) -> dict:
     first = read_page(run, url)
     pages[first["url"]] = first
     links = "\n".join(home["links"][:60])
-    prompt = (f"Brand website: {url}\n\nHOMEPAGE {first['url']}\nTITLE {first['title']}\nTEXT\n{first['text'][:PAGE_CHARS]}\n\n"
-              f"SAME-SITE LINKS ON THE HOMEPAGE:\n{links}\n\nRead the pages you need, then return the brief.")
+    prompt = reader_prompt(url, first, links, more, sorted(linked))
     agent = Agent(model=make_model(run.cassette, "brand_reader", _usage_sink(run), max_tokens=6000),
                   system_prompt=SYSTEM, tools=[fetch_page], callback_handler=None)
     result = agent(prompt, structured_output_model=BriefDraft, cancel_signal=run.cancel)
@@ -270,6 +308,52 @@ def _run_reader(run: Run, url: str, sites: set[str], home: dict) -> dict:
     for key, paths in purposes.items():
         _row(run, key, "DONE" if paths else "SKIPPED", ", ".join(paths) if paths else "No page of this kind found")
     return draft.model_dump()
+
+
+def reader_prompt(url: str, first: dict, links: str, more: list[str], linked: list[str]) -> str:
+    """The Brand reader's first message. For a rich homepage it is exactly the slice-1 text, so recorded reads still
+    replay; a thin homepage adds its sitemap pages and the pages on other sites it links to."""
+    extra = ""
+    if more:
+        extra += "OTHER PAGES OF THIS SITE (from its sitemap):\n" + "\n".join(more) + "\n\n"
+    if linked:
+        extra += ("PAGES ON OTHER SITES THAT THE HOMEPAGE LINKS TO (the brand's own links, for example its parent "
+                  "company's about or product pages; you may read these with fetch_page too, within the page limit):\n"
+                  + "\n".join(linked) + "\n\n")
+    return (f"Brand website: {url}\n\nHOMEPAGE {first['url']}\nTITLE {first['title']}\nTEXT\n{first['text'][:PAGE_CHARS]}\n\n"
+            f"SAME-SITE LINKS ON THE HOMEPAGE:\n{links}\n\n{extra}Read the pages you need, then return the brief.")
+
+
+def _norm_url(u: str) -> str:
+    try:
+        return fetch.check_url(u)
+    except fetch.FetchBlocked:
+        return u
+
+
+def _sitemap_pages(run: Run, url: str, sites: set[str], known: set[str], limit: int = 40) -> list[str]:
+    """Pages listed in the site's sitemap (robots.txt's Sitemap lines, else /sitemap.xml; one level of index), so a
+    thin homepage never leads to guessed addresses. At most 3 fetches."""
+    p = urlsplit(url)
+    rp = _robots.get((run.id, p.netloc))
+    maps = list((rp.site_maps() if rp else None) or [f"{p.scheme}://{p.netloc}/sitemap.xml"])[:1]
+    pages, fetched = [], 0
+    while maps and fetched < 3:
+        try:
+            r = fetch.get(maps.pop(0), run.cassette, "brand")
+        except fetch.FetchBlocked:
+            continue
+        fetched += 1
+        if r.get("status") != 200:
+            continue
+        for loc in fetch.sitemap_urls(r.get("body", "")):
+            if loc.lower().split("?")[0].endswith(".xml"):
+                maps.append(loc)
+            elif any(fetch.same_site(loc, s) for s in sites) and loc not in known and loc not in pages:
+                pages.append(loc)
+    if pages:
+        _activity(run, "Read the sitemap", "website reader", f"{len(pages)} more pages listed")
+    return pages[:limit]
 
 
 def _check(run: Run, draft: dict) -> list[dict]:
@@ -307,11 +391,22 @@ def _check(run: Run, draft: dict) -> list[dict]:
             state, reason = "TO_CHECK", "Quote not found on the page, so the claim is not established."
         elif v is None:
             state, reason = "TO_CHECK", "Not yet judged."
+        elif v["verdict"] == "SUPPORTED" and v.get("unsupported_parts"):
+            # The whole displayed row is the claim: support for part of it does not establish the row.
+            state, reason = "TO_CHECK", ("The quote supports part of this row but not: "
+                                         + "; ".join(v["unsupported_parts"]) + ".")
+        elif v["verdict"] == "SUPPORTED" and _hedge(c["value"]):
+            state, reason = "TO_CHECK", (f"The quote supports part of this row, but the row also says \"{_hedge(c['value'])}\", "
+                                         "which no page states. Only the confirmed part is a fact.")
         elif v["verdict"] == "SUPPORTED":
             state, reason = "SUPPORTED", v["reason"]
         else:
             state, reason = "TO_CHECK", f"The quote is on the page but does not establish this claim: {v['reason']}"
-        out.append({**c, "state": state, "support": v["verdict"] if v else None, "reason": reason,
+        partial = v and v["verdict"] == "SUPPORTED" and (v.get("unsupported_parts") or _hedge(c["value"]))
+        support = "PARTIAL" if partial else v["verdict"] if v else None
+        out.append({**c, "state": state, "support": support, "checker_verdict": v["verdict"] if v else None,
+                    "unsupported_parts": (v or {}).get("unsupported_parts", []),
+                    "reason": reason,
                     "claim_as_read": v.get("claim_as_read") if v else None, "checker": CHECKER_VERSION})
     supported = sum(1 for c in out if c["state"] == "SUPPORTED")
     _row(run, "check", "DONE", f"{supported} of {len(out)} quotes support their facts")
@@ -357,6 +452,7 @@ def _assemble(run: Run, draft: dict, claims: list[dict], route: str) -> dict:
             "source_ids": [sources[c["source_url"]]] if c.get("source_url") in sources else [],
             "quote": c.get("quote"), "quote_found": c.get("quote_found"), "support": c.get("support"),
             "reason": c.get("reason"), "claim_as_read": c.get("claim_as_read"), "checker": c.get("checker"),
+            "checker_verdict": c.get("checker_verdict"), "unsupported_parts": c.get("unsupported_parts") or [],
             "produced_by": f"{run.id}/check"})
         fact_ids.append(rec["id"])
     read = {s["url"]: s["id"] for s in db.q("SELECT id, url FROM sources WHERE project_id=? AND status=200", run.project_id)}
@@ -419,6 +515,7 @@ def brand_describe(run: Run):
                "quote_found": True, "reason": "Your description"} for s in d["stated"]]
     run.step("summary", lambda: _assemble(run, {**d, "facts": claims}, claims, route="description"))
     run.emit("founder", {"task": "Description", "detail": text})
+    _brief_ready(run)
 
 
 HANDLERS["brand_read"] = brand_read

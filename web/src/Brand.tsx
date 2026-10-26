@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { api, type Brief, type Claim, type Project, type SourceDetail, pathOf, shortDate, useProject } from "./api";
-import type { BasisFact } from "./api";
-import { Chip, DecisionBar, DrawerStack, EvidenceLink, Notice, ProjectHeader, Skeleton, StageNav, useDrawers } from "./ui";
+import type { BasisFact, Candidate } from "./api";
+import { DiscoveryGroup, IdentityChooser, ProfileEditor, QlooDrawer } from "./Discovery";
+import { GoalGroup, GoalRow, goalLine } from "./Goal";
+import { Chip, DecisionBar, DrawerStack, EvidenceLink, Notice, ProjectHeader, Skeleton, type Stage, StageNav, navigate, useDrawers } from "./ui";
 
 const NEXT = [
   ["Market scout", "Explores 80 cities using Qloo's cultural relationships and proposes a shortlist for your brand."],
@@ -15,6 +17,21 @@ const LEGEND = [
   ["UNKNOWN", "Not established; never counted as zero"],
 ];
 
+/** Brand and Markets in the stage nav; Markets links once it has something to show. */
+export function stagesFor(p: Project): Stage[] {
+  const name = p.brief?.brand_name || p.site;
+  const brand = p.brief ? `${name} · brief v${p.brief.version}` : "Reading the site";
+  const m = p.markets;
+  const outcome = m.stage === "scanning" ? "Scanning 80 cities" : m.stage === "scanned"
+    ? (m.shortlisted != null ? `${m.shortlisted} of 80 cities to research` : "80 cities scanned") : "Not started";
+  return [{ label: "Brand", outcome: brand, href: `/p/${p.id}` },
+    { label: "Markets", outcome, href: m.stage === "scanning" || m.stage === "scanned" ? `/p/${p.id}/markets` : undefined }];
+}
+
+export function usageLine(p: Project) {
+  return (p.demo ? "recorded" : `${p.usage.model_calls} calls · $${p.usage.est_usd.toFixed(3)}`) + ` · Qloo ${p.usage.qloo_sent} sent`;
+}
+
 export default function BrandPage({ id }: { id: string }) {
   const { project: p, error, reload } = useProject(id);
   const drawers = useDrawers();
@@ -22,10 +39,11 @@ export default function BrandPage({ id }: { id: string }) {
   const [notice, setNotice] = useState<string | null>(null);
   const sawReading = useRef(false);
 
-  // Auto-advance: the brief opens ~1 s after reading finishes (no "Review your brief" button).
+  // Auto-advance: the brief opens ~1 s after reading finishes AND identity is settled (decided or failed; P2-02).
+  const ready = !!p?.brief && !!p?.identity.settled;
   useEffect(() => {
     if (!p) return;
-    if (!p.brief) {
+    if (!ready) {
       sawReading.current = true;
       setShowBrief(false);
       return;
@@ -34,7 +52,7 @@ export default function BrandPage({ id }: { id: string }) {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const t = setTimeout(() => setShowBrief(true), reduce ? 0 : 1000);
     return () => clearTimeout(t);
-  }, [p?.brief?.version, p?.brief === null]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [p?.brief?.version, ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (error && !p) return <div className="app"><main className="page"><div className="error-panel card">{error} <a className="link" href="/">Start again</a></div></main></div>;
   if (!p) return <div className="app"><main className="page"><Skeleton width="40%" /></main></div>;
@@ -43,27 +61,37 @@ export default function BrandPage({ id }: { id: string }) {
   const brief = p.brief;
   const name = brief?.brand_name || p.site;
   const outcome = brief ? `${name} · brief v${brief.version}` : running ? "Reading the site" : "Reading stopped";
-  const usage = p.demo ? "recorded" : `${p.usage.model_calls} calls · $${p.usage.est_usd.toFixed(3)}`;
+  const usage = usageLine(p);
+  const ident = p.identity;
 
   const openEvidence = (c: Claim) =>
-    drawers.push({ key: `ev-${c.id}`, kicker: "EVIDENCE", render: () => <EvidenceDrawer claim={c} demo={p.demo} /> });
+    drawers.push({ key: `ev-${c.id}`, kicker: "EVIDENCE", render: () => <EvidenceDrawer claim={c} demo={p.demo} site={p.site} /> });
   const openInference = (c: Claim) =>
     drawers.push({ key: `inf-${c.id}`, kicker: "INFERENCE", render: () => <InferenceDrawer claim={c} onEvidence={openEvidence} /> });
   const openActivity = () => drawers.push({ key: "act", kicker: "ACTIVITY", render: () => <ActivityDrawer p={p} /> });
   const openBrief = () =>
-    brief && drawers.push({ key: "brief", kicker: "BRIEF", render: () => <BriefGroups brief={brief} p={p} onEvidence={openEvidence} onInference={openInference} /> });
+    brief && drawers.push({ key: "brief", kicker: "BRIEF", render: () => <BriefGroups brief={brief} p={p} onEvidence={openEvidence} onInference={openInference} discovery={discovery} /> });
+  const openQloo = (c: Candidate) => drawers.push({ key: `q-${c.qloo_id}`, kicker: "QLOO", render: () => <QlooDrawer c={c} p={p} /> });
+  const openNotYou = () => drawers.push({ key: "identity", kicker: "QLOO IDENTITY", render: () => <IdentityChooser p={p} onDone={() => { drawers.close(); reload(); }} /> });
+  const discovery = <DiscoveryGroup p={p} onNotYou={openNotYou} onQloo={openQloo} />;
+  const editor = p.profile && (p.profile.route !== "brand_entity" || p.profile.outdated) && ident.decision === "none"
+    ? <ProfileEditor p={p} onInference={openInference} reload={reload} /> : null;
 
   let body;
-  if (brief && showBrief) {
+  if (brief && showBrief && ready) {
     body = (
       <>
         <DecisionBar kicker={`BRAND · YOUR BRIEF V${brief.version}`} title={`Here's what we understand about ${name}`}
           subtitle="Correct anything important. Nothing else is needed to start: next, the Market scout looks across 80 cities for places related to your brand."
-          primary={{ label: "Start exploring markets", disabledReason: "The market scan arrives in the next build." }} />
+          primary={p.markets.stage === "ready" || (p.markets.outdated && !p.markets.reason)
+            ? { label: "Start exploring markets", onClick: async () => { await api.scan(p.id); navigate(`/p/${p.id}/markets/scan`); } }
+            : p.markets.stage === "none" ? { label: "Start exploring markets", disabledReason: p.markets_reason }
+            : { label: "See markets", onClick: () => navigate(`/p/${p.id}/markets`) }} />
         <div className="page">
           {notice && <Notice kind="you-changed">{notice}</Notice>}
           <div className="brief-layout">
-            <BriefGroups brief={brief} p={p} onEvidence={openEvidence} onInference={openInference} editable
+            <BriefGroups brief={brief} p={p} onEvidence={openEvidence} onInference={openInference} editable discovery={discovery} editor={editor}
+              goal={<GoalGroup p={p} reload={reload} />} intentRow={<GoalRow p={p} reload={reload} onNotice={setNotice} />}
               onCorrect={async (claim, value) => {
                 const r = await api.correct(p.id, brief.version, claim.id, value);
                 setNotice(r.notice);
@@ -89,6 +117,7 @@ export default function BrandPage({ id }: { id: string }) {
     body = (
       <>
         <DecisionBar kicker={`BRAND · READING ${p.site.toUpperCase()}`} title="We couldn't read the site" subtitle="Nothing is lost. Choose how to continue." />
+        {ident.status === "needs_founder" && <div className="page page-tight"><IdentityChooser p={p} onDone={reload} /></div>}
         <div className="page reading-layout">
           <ReaderCard p={p} stopped />
           <div className="stack">
@@ -100,13 +129,18 @@ export default function BrandPage({ id }: { id: string }) {
     );
   } else {
     const failed = !running && !brief;
+    const asking = ident.status === "needs_founder";
+    const title = asking ? (brief ? "Your brief is ready: one question first" : `One question while we read: which ${ident.site_name} is you?`)
+      : failed ? "Reading stopped" : brief ? "Your brief is ready: finding you in Qloo" : `Reading ${p.site}`;
     body = (
       <>
         <DecisionBar kicker={`BRAND · READING ${p.site.toUpperCase()}`}
-          title={failed ? "Reading stopped" : `Reading ${p.site}`}
-          subtitle={failed ? p.run?.message : "Your Brand reader is going through your public pages. Your brief opens as soon as it's ready."}
+          title={title}
+          subtitle={asking ? (brief ? "Answer and your brief opens." : "Answering now saves a wait later. Reading continues meanwhile.")
+            : failed ? p.run?.message : "Your Brand reader is going through your public pages. Your brief opens as soon as it's ready."}
           secondary={running && p.run ? <button type="button" className="btn-secondary" onClick={() => api.cancel(p.run!.id)}>Stop reading</button>
             : failed ? <button type="button" className="btn-secondary" onClick={() => api.retry(p.id)}>Try again</button> : undefined} />
+        {asking && <div className="page page-tight"><IdentityChooser p={p} onDone={reload} /></div>}
         <div className="page reading-layout">
           <ReaderCard p={p} />
           <div className="card">
@@ -122,9 +156,9 @@ export default function BrandPage({ id }: { id: string }) {
 
   return (
     <div className="app">
-      <ProjectHeader brand={name} site={p.site} intent={p.intent?.objective || "Explore where to expand for me"}
+      <ProjectHeader brand={name} site={p.site} intent={goalLine(p)}
         briefVersion={brief?.version} running={running} usage={usage} demo={p.demo} onBrief={openBrief} onActivity={openActivity} />
-      <StageNav brandOutcome={outcome} />
+      <StageNav stages={stagesFor(p).map((st, i) => (i === 0 ? { ...st, outcome } : st))} current={0} />
       <main id="main">{body}</main>
       <DrawerStack d={drawers} />
     </div>
@@ -186,7 +220,7 @@ function UnreadablePanel({ p, reason }: { p: Project; reason: string }) {
   );
 }
 
-function BriefGroups(props: { brief: Brief; p: Project; onEvidence: (c: Claim) => void; onInference: (c: Claim) => void; editable?: boolean; onCorrect?: (c: Claim, v: string) => Promise<void> }) {
+function BriefGroups(props: { brief: Brief; p: Project; onEvidence: (c: Claim) => void; onInference: (c: Claim) => void; editable?: boolean; onCorrect?: (c: Claim, v: string) => Promise<void>; discovery?: React.ReactNode; editor?: React.ReactNode; goal?: React.ReactNode; intentRow?: React.ReactNode }) {
   const { brief, p } = props;
   const site = brief.route === "site";
   return (
@@ -211,11 +245,15 @@ function BriefGroups(props: { brief: Brief; p: Project; onEvidence: (c: Claim) =
           </div>
         ))}
       </section>
+      {props.discovery}
+      {props.editor}
+      {props.goal}
       <section className="card group">
-        <div className="group-head"><h2 className="subheading">Your intent</h2><span className="small steel">{p.intent?.objective === "Explore where to expand for me" ? "Defaults" : "Your choices"}</span></div>
+        <div className="group-head"><h2 className="subheading">Your intent</h2><span className="small steel">Changes are a notice first; nothing reruns without you</span></div>
+        {props.intentRow}
         <div className="row row-3">
-          <span className="row-label">Intent</span>
-          <span>{p.intent?.objective} · {p.intent?.ceiling_usd ? `up to $${p.intent.ceiling_usd.toLocaleString()}` : "no budget"} · {p.intent?.include || p.intent?.exclude ? [p.intent.include && `include ${p.intent.include}`, p.intent.exclude && `leave out ${p.intent.exclude}`].filter(Boolean).join(" · ") : "no location preference"}
+          <span className="row-label">Also</span>
+          <span>{p.intent?.ceiling_usd ? `up to $${p.intent.ceiling_usd.toLocaleString()}` : "no budget"} · {p.intent?.include || p.intent?.exclude ? [p.intent.include && `include ${p.intent.include}`, p.intent.exclude && `leave out ${p.intent.exclude}`].filter(Boolean).join(" · ") : "no location preference"}
             <div className="mono steel prov">change in Advanced at the start</div></span>
           <Chip label="YOU SAID" />
         </div>
@@ -270,7 +308,7 @@ function BriefRow({ c, onEvidence, onInference, editable, onCorrect }: { c: Clai
   );
 }
 
-function EvidenceDrawer({ claim, demo }: { claim: Claim; demo: boolean }) {
+export function EvidenceDrawer({ claim, demo, site }: { claim: Claim; demo: boolean; site?: string }) {
   const [src, setSrc] = useState<SourceDetail | null>(null);
   useEffect(() => { if (claim.source) api.source(claim.source.id, claim.id).then(setSrc); }, [claim.id]); // eslint-disable-line react-hooks/exhaustive-deps
   const state = claim.state.replace("_", " ");
@@ -282,7 +320,8 @@ function EvidenceDrawer({ claim, demo }: { claim: Claim; demo: boolean }) {
       <div className="label steel">SOURCE</div>
       {claim.source ? (
         <div className="source-card">
-          <div><Chip label="YOUR SITE" /> <span className="mono steel">Read {src ? new Date(src.fetched_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "…"}{demo || src?.replayed ? " · recorded" : ""}</span></div>
+          <div><Chip label={!site || [site, `www.${site}`].includes(new URL(claim.source.url).hostname) || new URL(claim.source.url).hostname.endsWith(`.${site}`)
+            ? "YOUR SITE" : "LINKED FROM YOUR SITE"} title={site ? `Not on ${site}: a page your homepage links to` : undefined} /> <span className="mono steel">Read {src ? new Date(src.fetched_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "…"}{demo || src?.replayed ? " · recorded" : ""}</span></div>
           <a className="source-url" href={claim.source.url} target="_blank" rel="noreferrer noopener">{pathOf(claim.source.url)}</a>
           {claim.quote && <blockquote>{claim.quote}</blockquote>}
         </div>
@@ -354,7 +393,7 @@ function InferenceDrawer({ claim, onEvidence }: { claim: Claim; onEvidence: (c: 
   );
 }
 
-function ActivityDrawer({ p }: { p: Project }) {
+export function ActivityDrawer({ p }: { p: Project }) {
   const toCheck = p.brief ? p.brief.facts.filter((f) => f.state !== "SUPPORTED" && f.vc !== "U").length : 0;
   return (
     <div className="activity">
@@ -364,18 +403,27 @@ function ActivityDrawer({ p }: { p: Project }) {
         <div className="tile"><div className="label steel">MODEL CALLS</div><div className="figure">{p.usage.model_calls}</div>
           <div className="small steel">{p.demo ? "replayed from a recording" : `≈ $${p.usage.est_usd.toFixed(4)} operating cost`}</div></div>
         <div className="tile"><div className="label steel">PAGES FETCHED</div><div className="figure">{p.usage.pages_read}</div><div className="small steel">of {p.usage.pages_fetched} attempted, your site</div></div>
+        <div className="tile"><div className="label steel">QLOO REQUESTS SENT</div><div className="figure">{p.usage.qloo_sent}</div>
+          <div className="small steel">{p.demo ? "replayed from a recording" : `${p.usage.qloo_lookups} lookups · ${p.usage.qloo_cached} from cache`}</div></div>
         <div className="tile"><div className="label steel">TO CHECK</div><div className="figure">{toCheck}</div><div className="small steel">kept as unknown</div></div>
       </div>
-      <div className="act-stage">01 · Brand</div>
-      <ul className="act-list">
-        {p.activity.map((a) => (
-          <li key={a.seq}>
-            <Chip label={a.kind === "founder" ? "YOU SAID" : a.status || "DONE"} />
-            <div><strong>{a.task}</strong><div className="small">{a.detail}</div>
-              <div className="mono steel">{a.kind === "founder" ? "You" : `${a.role} · ${a.tool}`}</div></div>
-          </li>
-        ))}
-      </ul>
+      {(["Brand", "Markets"] as const).map((stage, i) => {
+        const items = p.activity.filter((a) => (a.stage || "Brand") === stage);
+        return items.length ? (
+          <React.Fragment key={stage}>
+            <div className="act-stage">0{i + 1} · {stage}</div>
+            <ul className="act-list">
+              {items.map((a) => (
+                <li key={a.seq}>
+                  <Chip label={a.kind === "founder" ? "YOU SAID" : a.status || "DONE"} />
+                  <div><strong>{a.task}</strong><div className="small">{a.detail}</div>
+                    <div className="mono steel">{a.kind === "founder" ? "You" : `${a.role} · ${a.tool}`}</div></div>
+                </li>
+              ))}
+            </ul>
+          </React.Fragment>
+        ) : null;
+      })}
       <p className="small steel">Operating cost is Landfall's own provider spend, separate from any launch budget of yours.</p>
     </div>
   );

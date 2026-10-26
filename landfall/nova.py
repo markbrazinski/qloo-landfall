@@ -57,6 +57,7 @@ def make_model(cassette: Cassette, stage: str, on_usage: Callable[[dict], None] 
             ex = cassette.lookup(key)
             if ex is not None:
                 cassette.reused(key, ex)
+                cassette.pace("bedrock")
                 r = ex["response"]
                 _report(r, replayed=True)
                 return AWSResponse(request.url, r["status"], r["headers"], _Raw(r["body"].encode()))

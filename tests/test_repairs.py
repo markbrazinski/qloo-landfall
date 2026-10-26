@@ -96,7 +96,7 @@ def test_checker_receives_the_full_displayed_claim(monkeypatch):
                         "source_url": "https://got-bag.com/pages/about-us", "quote": page}]}
     out = brand._check(run, draft)
     assert "field: founded | label: Founded | value: 2018" in seen["prompt"]
-    assert "founding date" in seen["system"] and brand.CHECKER_VERSION == "support_check@3"
+    assert "founding date" in seen["system"] and brand.CHECKER_VERSION == "support_check@4"
     c = out[0]
     assert c["quote_found"] is True and c["support"] == "PARTIAL" and c["state"] == "TO_CHECK"
     assert c["reason"].startswith("The quote is on the page but does not establish this claim")
@@ -209,6 +209,105 @@ def test_reader_accepts_both_the_entered_domain_and_its_redirect_target(monkeypa
                                                             "text": "Seit 2018 entwickeln wir Taschen.", "links": []})
     run = Run("run_g", "prj_g", "brand_read", {}, cassette=None)
     brand._run_reader(run, "https://gotbag.com/", {"gotbag.com", fetch.site_of("https://got-bag.com/")},
-                      {"links": []})
+                      {"links": [f"https://got-bag.com/p{i}" for i in range(brand.THIN_LINKS)]})  # a rich homepage
     assert tool_outputs[0].startswith("PAGE") and tool_outputs[1].startswith("PAGE")
     assert tool_outputs[2].startswith("Not read")
+
+
+# ---- closure round 2 ----
+GOTBAG_ROW = {"field": "where_sold", "label": "Where you sell",
+              "value": "Own flagship store at Frankfurt Airport, with potential other retail locations not specified",
+              "source_url": "https://got-bag.com/pages/store-locator", "quote": "GOT BAG Flagship-Store, Frankfurt Airport"}
+
+
+def _checker_returning(monkeypatch, verdicts):
+    class FakeAgent:
+        def __init__(self, **kw):
+            pass
+
+        def __call__(self, prompt, **kw):
+            return type("R", (), {"structured_output": brand.Verdicts(verdicts=[brand.Verdict(**v) for v in verdicts])})()
+    monkeypatch.setattr(brand, "Agent", FakeAgent)
+    monkeypatch.setattr(brand, "make_model", lambda *a, **k: None)
+
+
+def _store_locator_project(pid):
+    db.x("INSERT INTO projects VALUES(?,?,?,?,?,?,?)", pid, "s", "https://gotbag.com/", "live", None, None, db.now())
+    db.x("INSERT INTO sources VALUES(?,?,?,?,?,?,?,?,?,?)", f"src_{pid}", pid, "https://got-bag.com/pages/store-locator",
+         "https://got-bag.com/pages/store-locator", 200, db.now(), "Stores",
+         "Unsere Stores. GOT BAG Flagship-Store, Frankfurt Airport. Terminal 1.", None, 0)
+
+
+def test_support_for_part_of_a_row_does_not_establish_the_row(monkeypatch):
+    """Closure blocker 1, exact captured GOT BAG v5 input: the checker supported the store but not the extra clause."""
+    _store_locator_project("prj_p")
+    _checker_returning(monkeypatch, [{"claim_id": "f0", "claim_as_read": GOTBAG_ROW["value"], "verdict": "SUPPORTED",
+                                      "unsupported_parts": ["with potential other retail locations not specified"],
+                                      "reason": "The quote confirms the flagship store at Frankfurt Airport; other "
+                                                "locations are not contradicted but also not mentioned."}])
+    c = brand._check(Run("run_p", "prj_p", "brand_read", {}, cassette=None), {"facts": [dict(GOTBAG_ROW)]})[0]
+    assert c["quote_found"] and c["checker_verdict"] == "SUPPORTED"
+    assert c["state"] == "TO_CHECK" and c["support"] == "PARTIAL"
+    assert "with potential other retail locations not specified" in c["reason"]
+
+
+def test_a_fully_stated_paraphrase_stays_supported(monkeypatch):
+    _store_locator_project("prj_q")
+    row = {**GOTBAG_ROW, "value": "Own flagship store at Frankfurt Airport"}
+    _checker_returning(monkeypatch, [{"claim_id": "f0", "claim_as_read": row["value"], "verdict": "SUPPORTED",
+                                      "unsupported_parts": [], "reason": "The quote names the Frankfurt Airport store."}])
+    c = brand._check(Run("run_q", "prj_q", "brand_read", {}, cassette=None), {"facts": [row]})[0]
+    assert c["state"] == "SUPPORTED" and c["support"] == "SUPPORTED"
+
+
+def test_invalid_bracket_urls_are_isolated_and_the_brief_completes(monkeypatch):
+    """Closure blocker 2: 'https://[broken' raised ValueError from _check and _resolve_basis and lost the brief."""
+    _store_locator_project("prj_b")
+    _checker_returning(monkeypatch, [{"claim_id": "f0", "claim_as_read": "x", "verdict": "SUPPORTED",
+                                      "unsupported_parts": [], "reason": "names the store"}])
+    run = Run("run_b", "prj_b", "brand_read", {}, cassette=None)
+    draft = {"brand_name": "GOT BAG", "unknowns": [],
+             "facts": [{**GOTBAG_ROW, "value": "Flagship store at Frankfurt Airport"},
+                       {**GOTBAG_ROW, "value": "Other stores", "source_url": "https://[broken"}],
+             "interpretation": [{"field": "home_market", "label": "Home market", "value": "Germany", "basis_facts": [1],
+                                 "basis_pages": ["https://[broken", "https://got-bag.com/pages/store-locator"],
+                                 "reasoning": "The flagship is in Frankfurt."}]}
+    claims = brand._check(run, draft)
+    assert [c["state"] for c in claims] == ["SUPPORTED", "TO_CHECK"]
+    assert "not one Landfall read" in claims[1]["reason"]
+    out = brand._assemble(run, draft, claims, route="site")
+    brief = db.get_record(out["brief_id"])
+    reading = db.get_record(brief["interpretation"][0])
+    assert len(brief["facts"]) == 2 and reading["basis_established"]
+    assert reading["basis_dropped"] == ["https://[broken"] and reading["source_ids"] == ["src_prj_b"]
+
+
+def test_invalid_bracket_urls_at_the_edges_are_refused_cleanly():
+    from landfall import fetch
+    with pytest.raises(fetch.FetchBlocked):
+        fetch.check_url("https://[broken")
+    assert fetch.site_of("https://[broken") == "" and not fetch.same_site("https://[broken", "got-bag.com")
+    r = TestClient(app_module.app).post("/api/projects", json={"url": "https://[broken"})
+    assert r.status_code == 422
+
+
+def test_exact_captured_checker4_verdict_cannot_source_a_hedged_row(monkeypatch):
+    """GOT BAG v6, live checker@4 response: SUPPORTED, unsupported_parts [], reason 'the claim does not require
+    specification of other retail locations'. The hedged row must still not be SOURCE."""
+    _store_locator_project("prj_h")
+    _checker_returning(monkeypatch, [{
+        "claim_id": "f0", "verdict": "SUPPORTED", "unsupported_parts": [],
+        "claim_as_read": "Where you sell is Own flagship store at Frankfurt Airport, with potential other retail "
+                         "locations not specified",
+        "reason": "The quote states 'GOT BAG Flagship-Store, Frankfurt Airport' which directly supports the claim of "
+                  "having an own flagship store at Frankfurt Airport. The claim does not require specification of "
+                  "other retail locations, so the quote fully supports the claim as presented."}])
+    c = brand._check(Run("run_h", "prj_h", "brand_read", {}, cassette=None), {"facts": [dict(GOTBAG_ROW)]})[0]
+    assert c["checker_verdict"] == "SUPPORTED" and c["state"] == "TO_CHECK" and c["support"] == "PARTIAL"
+    assert "potential" in c["reason"]
+
+
+@pytest.mark.parametrize("value", ["Founded in May 2009 in Belgium", "Ships within the US only",
+                                   "41 neighbourhood shops in Portland and Seattle"])
+def test_plain_facts_are_not_mistaken_for_hedges(value):
+    assert brand._hedge(value) is None

@@ -1,5 +1,6 @@
 import { type FormEvent, useMemo, useState } from "react";
-import { api } from "./api";
+import { api, type Purpose, type Scope } from "./api";
+import { GoalSentence } from "./Goal";
 import { Chip, Lockup } from "./ui";
 
 const TEAM = [
@@ -21,7 +22,8 @@ const BUILT = [
 export default function Entry() {
   const [url, setUrl] = useState("");
   const [adv, setAdv] = useState(false);
-  const [fields, setFields] = useState({ objective: "Explore where to expand for me", ceiling: "", include: "", exclude: "" });
+  const [fields, setFields] = useState({ ceiling: "", include: "", exclude: "" });
+  const [goal, setGoal] = useState<{ scope: Scope; purpose: Purpose }>({ scope: "international", purpose: "presence" });
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const idem = useMemo(() => crypto.randomUUID(), []);
@@ -40,7 +42,7 @@ export default function Entry() {
   const submit = (e: FormEvent) => {
     e.preventDefault();
     start({
-      url, objective: fields.objective, ceiling_usd: fields.ceiling ? Number(fields.ceiling) : null,
+      url, ...goal, ceiling_usd: fields.ceiling ? Number(fields.ceiling) : null,
       include: fields.include || null, exclude: fields.exclude || null,
     });
   };
@@ -58,6 +60,7 @@ export default function Entry() {
             <input id="url" className="input input-lg" placeholder="yourbrand.com" value={url} autoComplete="url"
                    onChange={(e) => setUrl(e.target.value)} aria-invalid={!!error} aria-describedby={error ? "url-error" : undefined} />
             {error && <p id="url-error" className="field-error">{error}</p>}
+            <GoalSentence scope={goal.scope} purpose={goal.purpose} onChange={(c) => setGoal({ ...goal, ...c })} />
             <button type="submit" className="btn-primary btn-block" disabled={busy || !url.trim()}>
               {busy ? "Starting…" : "Start exploring"}
             </button>
@@ -69,21 +72,14 @@ export default function Entry() {
               </button>
             </div>
             <div className="default-box">
-              <Chip label="DEFAULT" /> <strong>Explore where to expand for me</strong>
-              <p className="small steel">No budget, objective or location needed. We ask only when one would change a decision.</p>
+              <Chip label="DEFAULT" /> <strong>Your website and Enter is enough</strong>
+              <p className="small steel">The goal above is pre-filled. No budget or location needed. We ask only when one would change a decision.</p>
             </div>
             <button type="button" className="link" aria-expanded={adv} onClick={() => setAdv(!adv)}>
               {adv ? "Hide advanced options" : "Advanced options (all optional)"}
             </button>
             {adv && (
               <div className="adv-grid">
-                <label>Objective
-                  <select className="input" value={fields.objective} onChange={set("objective")}>
-                    <option>Explore where to expand for me</option>
-                    <option>Test demand in a new country</option>
-                    <option>Find retail partners abroad</option>
-                  </select>
-                </label>
                 <label>Most you'd spend
                   <input className="input" inputMode="numeric" placeholder="Not set" value={fields.ceiling}
                          onChange={(e) => setFields({ ...fields, ceiling: e.target.value.replace(/\D/g, "") })} />

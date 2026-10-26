@@ -45,6 +45,12 @@ EXPIRES = datetime.fromisoformat(env("LANDFALL_AUTHORITY_EXPIRES", "2026-10-30T2
 
 # record | live | replay. Tests and the demo force replay.
 PROVIDER_MODE = env("LANDFALL_PROVIDER_MODE", "record")
+# Mixed replay/live (BUILD-PLAN §5): projects entered by URL replay these accepted case dirs at every provider boundary,
+# and only the named stages may go live on a miss (recorded to live-captures-private/runs/<project>/).
+REPLAY_CASES = [Path(d) for d in (env("LANDFALL_REPLAY_CASES") or "").split(",") if d]
+LIVE_STAGES = tuple(s for s in (env("LANDFALL_LIVE_STAGES") or "").split(",") if s)
+# Seconds to wait per replayed page or model exchange, so a replay paces like a read (browser checks of "while reading").
+REPLAY_DELAY = float(env("LANDFALL_REPLAY_DELAY") or 0)
 # Only the synthetic-site recorder sets this; production never fetches private addresses.
 ALLOW_PRIVATE_FETCH = env("LANDFALL_ALLOW_PRIVATE_FETCH") == "1"
 # e.g. "tidewell.example=127.0.0.1:8791": serves the fictional synthetic site locally; honoured only with the flag above.

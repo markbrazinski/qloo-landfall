@@ -1,0 +1,230 @@
+{
+ "version": "languages@1",
+ "source": "official national languages, builder, 25 Oct 2026; a country not listed is not known",
+ "countries": {
+  "AE": [
+   "ar"
+  ],
+  "AR": [
+   "es"
+  ],
+  "AT": [
+   "de"
+  ],
+  "AU": [
+   "en"
+  ],
+  "BE": [
+   "nl",
+   "fr",
+   "de"
+  ],
+  "BR": [
+   "pt"
+  ],
+  "CA": [
+   "en",
+   "fr"
+  ],
+  "CH": [
+   "de",
+   "fr",
+   "it",
+   "rm"
+  ],
+  "CL": [
+   "es"
+  ],
+  "CN": [
+   "zh"
+  ],
+  "CO": [
+   "es"
+  ],
+  "CZ": [
+   "cs"
+  ],
+  "DE": [
+   "de"
+  ],
+  "DK": [
+   "da"
+  ],
+  "EG": [
+   "ar"
+  ],
+  "ES": [
+   "es"
+  ],
+  "FI": [
+   "fi",
+   "sv"
+  ],
+  "FR": [
+   "fr"
+  ],
+  "GB": [
+   "en"
+  ],
+  "GH": [
+   "en"
+  ],
+  "HK": [
+   "zh",
+   "en"
+  ],
+  "ID": [
+   "id"
+  ],
+  "IE": [
+   "en",
+   "ga"
+  ],
+  "IL": [
+   "he"
+  ],
+  "IN": [
+   "hi",
+   "en"
+  ],
+  "IT": [
+   "it"
+  ],
+  "JP": [
+   "ja"
+  ],
+  "KE": [
+   "en",
+   "sw"
+  ],
+  "KR": [
+   "ko"
+  ],
+  "MA": [
+   "ar",
+   "zgh"
+  ],
+  "MX": [
+   "es"
+  ],
+  "MY": [
+   "ms"
+  ],
+  "NG": [
+   "en"
+  ],
+  "NL": [
+   "nl"
+  ],
+  "NO": [
+   "no"
+  ],
+  "NZ": [
+   "en",
+   "mi"
+  ],
+  "PE": [
+   "es",
+   "qu",
+   "ay"
+  ],
+  "PH": [
+   "fil",
+   "en"
+  ],
+  "PL": [
+   "pl"
+  ],
+  "PT": [
+   "pt"
+  ],
+  "QA": [
+   "ar"
+  ],
+  "SA": [
+   "ar"
+  ],
+  "SE": [
+   "sv"
+  ],
+  "SG": [
+   "en",
+   "ms",
+   "zh",
+   "ta"
+  ],
+  "TH": [
+   "th"
+  ],
+  "TR": [
+   "tr"
+  ],
+  "TW": [
+   "zh"
+  ],
+  "US": [
+   "en"
+  ],
+  "UY": [
+   "es"
+  ],
+  "VN": [
+   "vi"
+  ],
+  "ZA": [
+   "en",
+   "af",
+   "zu",
+   "xh"
+  ],
+  "BG": [
+   "bg"
+  ],
+  "HR": [
+   "hr"
+  ],
+  "CY": [
+   "el",
+   "tr"
+  ],
+  "EE": [
+   "et"
+  ],
+  "GR": [
+   "el"
+  ],
+  "HU": [
+   "hu"
+  ],
+  "LV": [
+   "lv"
+  ],
+  "LT": [
+   "lt"
+  ],
+  "LU": [
+   "lb",
+   "fr",
+   "de"
+  ],
+  "MT": [
+   "mt",
+   "en"
+  ],
+  "RO": [
+   "ro"
+  ],
+  "SK": [
+   "sk"
+  ],
+  "SI": [
+   "sl"
+  ],
+  "IS": [
+   "is"
+  ],
+  "LI": [
+   "de"
+  ]
+ }
+}

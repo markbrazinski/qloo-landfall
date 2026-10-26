@@ -51,6 +51,7 @@ class Cassette:
             ex = self._index.get(key)
             if ex is not None:
                 self.reused(key, ex)
+                self.pace(provider)
                 return ex["response"]
             if stage not in self.live_stages:
                 self.misses.append(f"{provider}:{op}")
@@ -59,6 +60,13 @@ class Cassette:
         if self.mode != "live" and self.record_dir is not None:
             self.write(key, provider, op, request, response, stage)
         return response
+
+    def pace(self, provider: str) -> None:
+        """Optional replay pacing for pages and model calls (LANDFALL_REPLAY_DELAY); Qloo answers stay immediate."""
+        from . import config
+        if config.REPLAY_DELAY and provider in ("fetch", "bedrock"):
+            import time
+            time.sleep(config.REPLAY_DELAY)
 
     def reused(self, key: str, ex: dict) -> None:
         """When building a replacement case, carry a replayed exchange over with a pointer to its original."""

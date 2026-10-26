@@ -1,0 +1,646 @@
+{
+ "version": "catalog@1",
+ "radius_m": 15000,
+ "cities": [
+  {
+   "city_id": "toronto",
+   "name": "Toronto",
+   "country": "CA",
+   "region": "North America",
+   "lat": 43.7,
+   "lon": -79.4
+  },
+  {
+   "city_id": "vancouver",
+   "name": "Vancouver",
+   "country": "CA",
+   "region": "North America",
+   "lat": 49.3,
+   "lon": -123.1
+  },
+  {
+   "city_id": "chicago",
+   "name": "Chicago",
+   "country": "US",
+   "region": "North America",
+   "lat": 41.9,
+   "lon": -87.6
+  },
+  {
+   "city_id": "montreal",
+   "name": "Montreal",
+   "country": "CA",
+   "region": "North America",
+   "lat": 45.5,
+   "lon": -73.6
+  },
+  {
+   "city_id": "new-york",
+   "name": "New York",
+   "country": "US",
+   "region": "North America",
+   "lat": 40.7,
+   "lon": -74
+  },
+  {
+   "city_id": "los-angeles",
+   "name": "Los Angeles",
+   "country": "US",
+   "region": "North America",
+   "lat": 34,
+   "lon": -118.2
+  },
+  {
+   "city_id": "san-francisco",
+   "name": "San Francisco",
+   "country": "US",
+   "region": "North America",
+   "lat": 37.8,
+   "lon": -122.4
+  },
+  {
+   "city_id": "seattle",
+   "name": "Seattle",
+   "country": "US",
+   "region": "North America",
+   "lat": 47.6,
+   "lon": -122.3
+  },
+  {
+   "city_id": "austin",
+   "name": "Austin",
+   "country": "US",
+   "region": "North America",
+   "lat": 30.3,
+   "lon": -97.7
+  },
+  {
+   "city_id": "denver",
+   "name": "Denver",
+   "country": "US",
+   "region": "North America",
+   "lat": 39.7,
+   "lon": -105
+  },
+  {
+   "city_id": "boston",
+   "name": "Boston",
+   "country": "US",
+   "region": "North America",
+   "lat": 42.4,
+   "lon": -71.1
+  },
+  {
+   "city_id": "minneapolis",
+   "name": "Minneapolis",
+   "country": "US",
+   "region": "North America",
+   "lat": 45,
+   "lon": -93.3
+  },
+  {
+   "city_id": "mexico-city",
+   "name": "Mexico City",
+   "country": "MX",
+   "region": "North America",
+   "lat": 19.4,
+   "lon": -99.1
+  },
+  {
+   "city_id": "philadelphia",
+   "name": "Philadelphia",
+   "country": "US",
+   "region": "North America",
+   "lat": 40,
+   "lon": -75.2
+  },
+  {
+   "city_id": "washington-dc",
+   "name": "Washington DC",
+   "country": "US",
+   "region": "North America",
+   "lat": 38.9,
+   "lon": -77
+  },
+  {
+   "city_id": "calgary",
+   "name": "Calgary",
+   "country": "CA",
+   "region": "North America",
+   "lat": 51,
+   "lon": -114
+  },
+  {
+   "city_id": "london",
+   "name": "London",
+   "country": "GB",
+   "region": "Europe",
+   "lat": 51.5,
+   "lon": -0.1
+  },
+  {
+   "city_id": "copenhagen",
+   "name": "Copenhagen",
+   "country": "DK",
+   "region": "Europe",
+   "lat": 55.7,
+   "lon": 12.6
+  },
+  {
+   "city_id": "paris",
+   "name": "Paris",
+   "country": "FR",
+   "region": "Europe",
+   "lat": 48.9,
+   "lon": 2.35
+  },
+  {
+   "city_id": "berlin",
+   "name": "Berlin",
+   "country": "DE",
+   "region": "Europe",
+   "lat": 52.5,
+   "lon": 13.4
+  },
+  {
+   "city_id": "amsterdam",
+   "name": "Amsterdam",
+   "country": "NL",
+   "region": "Europe",
+   "lat": 52.4,
+   "lon": 4.9
+  },
+  {
+   "city_id": "lisbon",
+   "name": "Lisbon",
+   "country": "PT",
+   "region": "Europe",
+   "lat": 38.7,
+   "lon": -9.1
+  },
+  {
+   "city_id": "barcelona",
+   "name": "Barcelona",
+   "country": "ES",
+   "region": "Europe",
+   "lat": 41.4,
+   "lon": 2.2
+  },
+  {
+   "city_id": "madrid",
+   "name": "Madrid",
+   "country": "ES",
+   "region": "Europe",
+   "lat": 40.4,
+   "lon": -3.7
+  },
+  {
+   "city_id": "stockholm",
+   "name": "Stockholm",
+   "country": "SE",
+   "region": "Europe",
+   "lat": 59.3,
+   "lon": 18.1
+  },
+  {
+   "city_id": "oslo",
+   "name": "Oslo",
+   "country": "NO",
+   "region": "Europe",
+   "lat": 59.9,
+   "lon": 10.8
+  },
+  {
+   "city_id": "helsinki",
+   "name": "Helsinki",
+   "country": "FI",
+   "region": "Europe",
+   "lat": 60.2,
+   "lon": 24.9
+  },
+  {
+   "city_id": "dublin",
+   "name": "Dublin",
+   "country": "IE",
+   "region": "Europe",
+   "lat": 53.3,
+   "lon": -6.3
+  },
+  {
+   "city_id": "manchester",
+   "name": "Manchester",
+   "country": "GB",
+   "region": "Europe",
+   "lat": 53.5,
+   "lon": -2.2
+  },
+  {
+   "city_id": "edinburgh",
+   "name": "Edinburgh",
+   "country": "GB",
+   "region": "Europe",
+   "lat": 55.95,
+   "lon": -3.2
+  },
+  {
+   "city_id": "vienna",
+   "name": "Vienna",
+   "country": "AT",
+   "region": "Europe",
+   "lat": 48.2,
+   "lon": 16.4
+  },
+  {
+   "city_id": "zurich",
+   "name": "Zurich",
+   "country": "CH",
+   "region": "Europe",
+   "lat": 47.4,
+   "lon": 8.5
+  },
+  {
+   "city_id": "milan",
+   "name": "Milan",
+   "country": "IT",
+   "region": "Europe",
+   "lat": 45.5,
+   "lon": 9.2
+  },
+  {
+   "city_id": "munich",
+   "name": "Munich",
+   "country": "DE",
+   "region": "Europe",
+   "lat": 48.1,
+   "lon": 11.6
+  },
+  {
+   "city_id": "brussels",
+   "name": "Brussels",
+   "country": "BE",
+   "region": "Europe",
+   "lat": 50.85,
+   "lon": 4.35
+  },
+  {
+   "city_id": "prague",
+   "name": "Prague",
+   "country": "CZ",
+   "region": "Europe",
+   "lat": 50.1,
+   "lon": 14.4
+  },
+  {
+   "city_id": "warsaw",
+   "name": "Warsaw",
+   "country": "PL",
+   "region": "Europe",
+   "lat": 52.2,
+   "lon": 21
+  },
+  {
+   "city_id": "hamburg",
+   "name": "Hamburg",
+   "country": "DE",
+   "region": "Europe",
+   "lat": 53.55,
+   "lon": 10
+  },
+  {
+   "city_id": "melbourne",
+   "name": "Melbourne",
+   "country": "AU",
+   "region": "Asia-Pacific",
+   "lat": -37.8,
+   "lon": 145
+  },
+  {
+   "city_id": "sydney",
+   "name": "Sydney",
+   "country": "AU",
+   "region": "Asia-Pacific",
+   "lat": -33.9,
+   "lon": 151.2
+  },
+  {
+   "city_id": "auckland",
+   "name": "Auckland",
+   "country": "NZ",
+   "region": "Asia-Pacific",
+   "lat": -36.8,
+   "lon": 174.8
+  },
+  {
+   "city_id": "tokyo",
+   "name": "Tokyo",
+   "country": "JP",
+   "region": "Asia-Pacific",
+   "lat": 35.7,
+   "lon": 139.7
+  },
+  {
+   "city_id": "osaka",
+   "name": "Osaka",
+   "country": "JP",
+   "region": "Asia-Pacific",
+   "lat": 34.7,
+   "lon": 135.5
+  },
+  {
+   "city_id": "seoul",
+   "name": "Seoul",
+   "country": "KR",
+   "region": "Asia-Pacific",
+   "lat": 37.6,
+   "lon": 127
+  },
+  {
+   "city_id": "singapore",
+   "name": "Singapore",
+   "country": "SG",
+   "region": "Asia-Pacific",
+   "lat": 1.35,
+   "lon": 103.8
+  },
+  {
+   "city_id": "hong-kong",
+   "name": "Hong Kong",
+   "country": "HK",
+   "region": "Asia-Pacific",
+   "lat": 22.3,
+   "lon": 114.2
+  },
+  {
+   "city_id": "taipei",
+   "name": "Taipei",
+   "country": "TW",
+   "region": "Asia-Pacific",
+   "lat": 25,
+   "lon": 121.5
+  },
+  {
+   "city_id": "bangkok",
+   "name": "Bangkok",
+   "country": "TH",
+   "region": "Asia-Pacific",
+   "lat": 13.75,
+   "lon": 100.5
+  },
+  {
+   "city_id": "brisbane",
+   "name": "Brisbane",
+   "country": "AU",
+   "region": "Asia-Pacific",
+   "lat": -27.5,
+   "lon": 153
+  },
+  {
+   "city_id": "perth",
+   "name": "Perth",
+   "country": "AU",
+   "region": "Asia-Pacific",
+   "lat": -32,
+   "lon": 115.9
+  },
+  {
+   "city_id": "wellington",
+   "name": "Wellington",
+   "country": "NZ",
+   "region": "Asia-Pacific",
+   "lat": -41.3,
+   "lon": 174.8
+  },
+  {
+   "city_id": "kuala-lumpur",
+   "name": "Kuala Lumpur",
+   "country": "MY",
+   "region": "Asia-Pacific",
+   "lat": 3.1,
+   "lon": 101.7
+  },
+  {
+   "city_id": "manila",
+   "name": "Manila",
+   "country": "PH",
+   "region": "Asia-Pacific",
+   "lat": 14.6,
+   "lon": 121
+  },
+  {
+   "city_id": "jakarta",
+   "name": "Jakarta",
+   "country": "ID",
+   "region": "Asia-Pacific",
+   "lat": -6.2,
+   "lon": 106.8
+  },
+  {
+   "city_id": "ho-chi-minh-city",
+   "name": "Ho Chi Minh City",
+   "country": "VN",
+   "region": "Asia-Pacific",
+   "lat": 10.8,
+   "lon": 106.7
+  },
+  {
+   "city_id": "shanghai",
+   "name": "Shanghai",
+   "country": "CN",
+   "region": "Asia-Pacific",
+   "lat": 31.2,
+   "lon": 121.5
+  },
+  {
+   "city_id": "mumbai",
+   "name": "Mumbai",
+   "country": "IN",
+   "region": "Asia-Pacific",
+   "lat": 19.1,
+   "lon": 72.9
+  },
+  {
+   "city_id": "bengaluru",
+   "name": "Bengaluru",
+   "country": "IN",
+   "region": "Asia-Pacific",
+   "lat": 13,
+   "lon": 77.6
+  },
+  {
+   "city_id": "sao-paulo",
+   "name": "São Paulo",
+   "country": "BR",
+   "region": "Latin America",
+   "lat": -23.5,
+   "lon": -46.6
+  },
+  {
+   "city_id": "buenos-aires",
+   "name": "Buenos Aires",
+   "country": "AR",
+   "region": "Latin America",
+   "lat": -34.6,
+   "lon": -58.4
+  },
+  {
+   "city_id": "santiago",
+   "name": "Santiago",
+   "country": "CL",
+   "region": "Latin America",
+   "lat": -33.4,
+   "lon": -70.6
+  },
+  {
+   "city_id": "bogota",
+   "name": "Bogotá",
+   "country": "CO",
+   "region": "Latin America",
+   "lat": 4.7,
+   "lon": -74.1
+  },
+  {
+   "city_id": "lima",
+   "name": "Lima",
+   "country": "PE",
+   "region": "Latin America",
+   "lat": -12,
+   "lon": -77
+  },
+  {
+   "city_id": "medellin",
+   "name": "Medellín",
+   "country": "CO",
+   "region": "Latin America",
+   "lat": 6.2,
+   "lon": -75.6
+  },
+  {
+   "city_id": "rio-de-janeiro",
+   "name": "Rio de Janeiro",
+   "country": "BR",
+   "region": "Latin America",
+   "lat": -22.9,
+   "lon": -43.2
+  },
+  {
+   "city_id": "montevideo",
+   "name": "Montevideo",
+   "country": "UY",
+   "region": "Latin America",
+   "lat": -34.9,
+   "lon": -56.2
+  },
+  {
+   "city_id": "guadalajara",
+   "name": "Guadalajara",
+   "country": "MX",
+   "region": "Latin America",
+   "lat": 20.7,
+   "lon": -103.3
+  },
+  {
+   "city_id": "monterrey",
+   "name": "Monterrey",
+   "country": "MX",
+   "region": "Latin America",
+   "lat": 25.7,
+   "lon": -100.3
+  },
+  {
+   "city_id": "dubai",
+   "name": "Dubai",
+   "country": "AE",
+   "region": "Middle East & Africa",
+   "lat": 25.2,
+   "lon": 55.3
+  },
+  {
+   "city_id": "tel-aviv",
+   "name": "Tel Aviv",
+   "country": "IL",
+   "region": "Middle East & Africa",
+   "lat": 32.1,
+   "lon": 34.8
+  },
+  {
+   "city_id": "cape-town",
+   "name": "Cape Town",
+   "country": "ZA",
+   "region": "Middle East & Africa",
+   "lat": -33.9,
+   "lon": 18.4
+  },
+  {
+   "city_id": "johannesburg",
+   "name": "Johannesburg",
+   "country": "ZA",
+   "region": "Middle East & Africa",
+   "lat": -26.2,
+   "lon": 28
+  },
+  {
+   "city_id": "nairobi",
+   "name": "Nairobi",
+   "country": "KE",
+   "region": "Middle East & Africa",
+   "lat": -1.3,
+   "lon": 36.8
+  },
+  {
+   "city_id": "lagos",
+   "name": "Lagos",
+   "country": "NG",
+   "region": "Middle East & Africa",
+   "lat": 6.5,
+   "lon": 3.4
+  },
+  {
+   "city_id": "istanbul",
+   "name": "Istanbul",
+   "country": "TR",
+   "region": "Middle East & Africa",
+   "lat": 41,
+   "lon": 29
+  },
+  {
+   "city_id": "doha",
+   "name": "Doha",
+   "country": "QA",
+   "region": "Middle East & Africa",
+   "lat": 25.3,
+   "lon": 51.5
+  },
+  {
+   "city_id": "riyadh",
+   "name": "Riyadh",
+   "country": "SA",
+   "region": "Middle East & Africa",
+   "lat": 24.7,
+   "lon": 46.7
+  },
+  {
+   "city_id": "casablanca",
+   "name": "Casablanca",
+   "country": "MA",
+   "region": "Middle East & Africa",
+   "lat": 33.6,
+   "lon": -7.6
+  },
+  {
+   "city_id": "cairo",
+   "name": "Cairo",
+   "country": "EG",
+   "region": "Middle East & Africa",
+   "lat": 30,
+   "lon": 31.2
+  },
+  {
+   "city_id": "accra",
+   "name": "Accra",
+   "country": "GH",
+   "region": "Middle East & Africa",
+   "lat": 5.6,
+   "lon": -0.2
+  }
+ ]
+}

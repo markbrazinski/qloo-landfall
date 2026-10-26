@@ -178,3 +178,26 @@ def test_unfinalised_reservation_stays_unresolved_exposure():
 def test_nova_cost_uses_verified_prices():
     assert ledger.nova_cost(1000, 1000) == pytest.approx(0.00033 + 0.00275)
     assert ledger.nova_cost(0, 0, grounding_calls=2) == pytest.approx(0.06)
+
+
+def test_dns_falls_back_to_encrypted_dns_and_keeps_the_address_checks(monkeypatch):
+    """SYNTHETIC: the system resolver fails (as an intercepting network does); DNS over HTTPS answers."""
+    import socket
+
+    from landfall import fetch
+
+    def no_answer(*a, **k):
+        raise socket.gaierror(8, "nodename nor servname provided, or not known")
+    monkeypatch.setattr(fetch.socket, "getaddrinfo", no_answer)
+    monkeypatch.setattr(fetch, "_doh", lambda host: ["45.223.17.132"])
+    assert fetch._resolve("brand.example", 443) == ["45.223.17.132"]
+    connected = []
+    monkeypatch.setattr(fetch.httpcore.SyncBackend, "connect_tcp", lambda self, host, *a, **k: connected.append(host))
+    fetch._GuardedBackend().connect_tcp("brand.example", 443)
+    assert connected == ["45.223.17.132"]  # pinned to the vetted address
+    monkeypatch.setattr(fetch, "_doh", lambda host: ["10.0.0.5"])
+    with pytest.raises(fetch.FetchBlocked):  # a private answer from DoH is refused like any other
+        fetch._GuardedBackend().connect_tcp("brand.example", 443)
+    monkeypatch.setattr(fetch, "_doh", lambda host: [])
+    with pytest.raises(socket.gaierror):  # no answer anywhere: the original failure stands (reported as DNS)
+        fetch._resolve("brand.example", 443)

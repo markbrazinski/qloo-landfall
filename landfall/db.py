@@ -26,7 +26,13 @@ CREATE TABLE IF NOT EXISTS events(project_id TEXT NOT NULL, seq INTEGER NOT NULL
   kind TEXT NOT NULL, payload TEXT NOT NULL, PRIMARY KEY(project_id, seq));
 CREATE TABLE IF NOT EXISTS usage(project_id TEXT NOT NULL, run_id TEXT, at TEXT NOT NULL, provider TEXT NOT NULL, stage TEXT,
   replayed INTEGER NOT NULL, input_tokens INTEGER, output_tokens INTEGER, est_usd REAL, status INTEGER);
+CREATE TABLE IF NOT EXISTS provider_cache(key TEXT PRIMARY KEY, provider TEXT NOT NULL, response TEXT NOT NULL,
+  fetched_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS qloo_refs(project_id TEXT NOT NULL, qloo_id TEXT NOT NULL, kind TEXT NOT NULL, name TEXT,
+  type TEXT, PRIMARY KEY(project_id, qloo_id));
 """
+# Columns added after slice 1 (an existing database keeps its rows). ponytail: no migration tool until a second one.
+MIGRATIONS = ["ALTER TABLE usage ADD COLUMN origin TEXT", "ALTER TABLE usage ADD COLUMN attempt INTEGER"]
 
 _lock = threading.RLock()
 _conn: sqlite3.Connection | None = None
@@ -48,6 +54,11 @@ def conn() -> sqlite3.Connection:
         _conn.row_factory = sqlite3.Row
         _conn.execute("PRAGMA journal_mode=WAL")
         _conn.executescript(SCHEMA)
+        for m in MIGRATIONS:
+            try:
+                _conn.execute(m)
+            except sqlite3.OperationalError:
+                pass  # already applied
     return _conn
 
 

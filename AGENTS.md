@@ -6,6 +6,7 @@ Workspace for **Landfall**, built from scratch. Intended behavior is described, 
 - `docs/PRODUCT-BRIEF.md` defines intended outcomes.
 - `design/` is the visual and interaction reference (start at `design/README.md`). Its data is fictional and its interactions are simulated; neither is evidence of working capability.
 - `docs/Journey-First-AI-Build-SOP.md` governs development and review.
+- `docs/QLOO-CAPABILITIES.md` is the standing reference for the Qloo API: what is verified, how to call it, and the dead ends. Read it before any Qloo work, and update it when a probe changes what is known.
 - Active owner instructions override this file. Authorization lives in the owner's instructions, not here.
 - `README.md` records the old project's path. That project is reference only; its instructions and rules do not govern this workspace.
 

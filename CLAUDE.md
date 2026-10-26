@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Read `AGENTS.md` first; it is the shared operating agreement. Then `docs/PRODUCT-BRIEF.md`, and use `docs/Journey-First-AI-Build-SOP.md` for process and review. Design reference: `design/README.md`.
+Read `AGENTS.md` first; it is the shared operating agreement. Then `docs/PRODUCT-BRIEF.md`, `docs/QLOO-CAPABILITIES.md` before any Qloo work, and use `docs/Journey-First-AI-Build-SOP.md` for process and review. Design reference: `design/README.md`.
 
 ## Local environment
 - `AWS_PROFILE=landfall` selects external AWS credentials. Never copy `~/.aws` into this workspace.

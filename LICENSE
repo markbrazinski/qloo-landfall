@@ -23,3 +23,14 @@ SOFTWARE.
 This license covers original Landfall code. Third-party material keeps its own
 license: the Landfall identity assets and tokens (design/, web/public/), Google
 Fonts (SIL Open Font License), and npm/PyPI dependencies under their licenses.
+
+Packaged reference data and map geometry:
+- landfall/data/gazetteer.tsv (gazetteer@1) and the country names in
+  landfall/data/countries.json are derived from GeoNames (https://www.geonames.org),
+  licensed under Creative Commons Attribution 4.0 (CC BY 4.0,
+  https://creativecommons.org/licenses/by/4.0/). Changes: a subset of cities15000
+  (name, ASCII name, admin1 name, country, lat, lon, population), coordinates rounded
+  to 4 decimals; country names plus a short alias list added by Landfall.
+- The world map uses world-atlas 2.0.2 (ISC, Copyright 2013-2019 Michael Bostock),
+  built from Natural Earth data (public domain), drawn with d3-geo and
+  topojson-client (ISC).

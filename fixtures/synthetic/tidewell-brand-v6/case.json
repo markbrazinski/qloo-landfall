@@ -1,0 +1,37 @@
+{
+ "case_id": "synthetic-tidewell-v6",
+ "label": "SYNTHETIC \u00b7 fictional Tidewell site; all exchanges reused, current decision layer",
+ "status": "synthetic public fixture",
+ "slice": 1,
+ "input": {
+  "url": "http://tidewell.example/"
+ },
+ "recorded_from_project": "prj_3d49a47a03c24c2b",
+ "recorded_at": "2026-10-24T11:52:50+00:00",
+ "model": "us.amazon.nova-2-lite-v1:0",
+ "prompt_versions": [
+  "brand_reader@5",
+  "support_check@4"
+ ],
+ "expected_semantic_outcomes": [
+  "every interpretation shows what it is inferred from",
+  "a row with an unstated clause is not SOURCE"
+ ],
+ "replaces": "fixtures/synthetic/tidewell-brand-v5",
+ "reason": "replay-only: deterministic hedged-row guard added after checker@4 (closure blocker 1); no provider requests changed; earlier version kept unchanged",
+ "provenance": {
+  "reused_exchanges": 9,
+  "new_live_exchanges": 0,
+  "live_stages": [
+   "none"
+  ],
+  "original_capture": "2026-10-24T11:51:30+00:00",
+  "v1_checksums": "fe45ac75048f37c9cd6ae2c30690ab78e861363bf96e445c369b92df6947c623  case.json\n1556b8d21b2e5466821f7aaf03f6f837e8d9532def067ee54b26e32f0e4e765c  exchanges.jsonl\na1ae72afa7321690e15f72ff2a070d749cace2e7f6e9136067a584405ff267d4  trace.json\n"
+ },
+ "incremental_usage": {
+  "bedrock_usd": 0.0,
+  "bedrock_calls": 0,
+  "fetches": 0,
+  "qloo": 0
+ }
+}

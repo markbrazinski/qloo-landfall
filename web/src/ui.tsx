@@ -2,16 +2,24 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 
 // ---- LF-StatusChip: knowledge state as text first, colour second (COMPONENT-CATALOG §9) ----
 const CATEGORY: Record<string, string[]> = {
-  sourced: ["SOURCE", "SUPPORTED", "STATED", "LISTED RATE", "PRESENCE VERIFIED", "DONE", "YOUR SITE"],
-  founder: ["YOU SAID", "ADDED BY YOU", "NEEDS YOU", "CHECKED BY YOU", "DEFAULT", "DESCRIPTION"],
-  qloo: ["QLOO", "QLOO · CATEGORY", "CANDIDATE", "RETURNED"],
-  interpretation: ["TEAM READ", "INFERRED", "ESTIMATE", "ASSUMED", "DRAFT", "CALC"],
-  unknown: ["UNKNOWN", "NOT KNOWN", "TO CHECK", "NOT CHECKED", "NOT READ", "BASIS NOT ESTABLISHED"],
-  contested: ["SOURCES DIFFER", "AMBIGUOUS", "UNCONFIRMED", "REVIEW · FACT CHANGED"],
-  failed: ["FAILED", "CHECK FAILED", "UNAVAILABLE", "SITE UNREADABLE"],
-  running: ["RUNNING", "CHECKING", "READING"],
-  idle: ["QUEUED", "SKIPPED", "SUPERSEDED", "STOPPED"],
-  proposal: ["DEMONSTRATION", "RECORDED", "SYNTHETIC"],
+  sourced: ["SOURCE", "SUPPORTED", "STATED", "LISTED RATE", "PRESENCE VERIFIED", "DONE", "YOUR SITE",
+    "NAME MATCHES YOUR SITE", "WEBSITE MATCHES", "LINKED FROM YOUR SITE", "ON YOUR HOMEPAGE", "SAME COUNTRY", "INSIDE YOUR RANGE", "NO IMPORT STEP (EU)",
+    "SAME TRADE BLOC", "SHARED LANGUAGE", "HOME", "HOME COUNTRY"],
+  founder: ["YOU SAID", "ADDED BY YOU", "NEEDS YOU", "CHECKED BY YOU", "DEFAULT", "DESCRIPTION", "CONFIRMED", "YOU CHANGED",
+    "YOU LEFT THIS OUT", "YOU'RE ALREADY HERE", "MOVED FOR YOUR GOAL"],
+  qloo: ["QLOO", "QLOO · CATEGORY", "COMPARABLE · NOT YOU", "CANDIDATE", "RETURNED", "QLOO STORES", "QLOO KEY MARKET"],
+  interpretation: ["TEAM READ", "DETERMINISTIC", "MIXED", "INFERRED", "ESTIMATE", "ASSUMED", "DRAFT", "CALC", "MODERATE · NOT YET CHECKED",
+    "LIMITED · NOT YET CHECKED"],
+  unknown: ["UNKNOWN", "NOT KNOWN", "TO CHECK", "NOT CHECKED", "NOT READ", "BASIS NOT ESTABLISHED", "NOT CONFIRMED",
+    "UNRESOLVED", "COULDN'T RESOLVE", "THIN SEARCH RESULT", "FIT NOT KNOWN", "IMPORT NEEDED", "COULD CHANGE IT",
+    "EXPLORE BY ANOTHER ROUTE", "INSUFFICIENT EVIDENCE", "NOT RANKED BY QLOO", "IMPORT, NEW LANGUAGE"],
+  contested: ["SOURCES DIFFER", "AMBIGUOUS", "UNCONFIRMED", "REVIEW · FACT CHANGED", "DIFFERENT WEBSITE"],
+  failed: ["FAILED", "CHECK FAILED", "UNAVAILABLE", "SITE UNREADABLE", "DROPPED BY CHECKS"],
+  running: ["RUNNING", "CHECKING", "READING", "SEARCHING"],
+  idle: ["QUEUED", "SKIPPED", "SUPERSEDED", "STOPPED", "NO MATCH", "EMPTY", "STRONG ALTERNATIVE", "ALSO WORTH RESEARCHING",
+    "NOT PRIORITISED", "NOT PROPOSED", "OUTSIDE YOUR GOAL"],
+  proposal: ["DEMONSTRATION", "RECORDED", "SYNTHETIC", "PROPOSED", "RESEARCH PRIORITY", "INVESTIGATE FIRST", "TOP RECOMMENDATION",
+    "RECOMMENDED"],
 };
 const categoryOf = (label: string) =>
   Object.entries(CATEGORY).find(([, ls]) => ls.includes(label.toUpperCase()))?.[0] ?? "idle";
@@ -46,9 +54,20 @@ export function Lockup() {
   );
 }
 
+// ---- a tiny router: pushState plus a popstate the app listens to ----
+export function navigate(to: string) {
+  window.history.pushState({}, "", to);
+  window.dispatchEvent(new PopStateEvent("popstate"));
+  window.scrollTo(0, 0);
+}
+
+export function Link({ to, className, children }: { to: string; className?: string; children: ReactNode }) {
+  return <a href={to} className={className} onClick={(e) => { e.preventDefault(); navigate(to); }}>{children}</a>;
+}
+
 // ---- LF-AppShell / LF-ProjectHeader / LF-StageNav ----
-export type Stage = { label: string; outcome: string };
-const STAGES = ["Brand", "Markets", "Opportunities", "Decide", "Pursue"];
+export type Stage = { label: string; outcome: string; href?: string };
+const LATER = ["Opportunities", "Decide", "Pursue"];
 
 export function ProjectHeader(props: {
   brand: string; site: string; intent: string; briefVersion?: number; running: boolean; usage: string; demo: boolean;
@@ -81,25 +100,33 @@ export function ProjectHeader(props: {
   );
 }
 
-export function StageNav({ brandOutcome }: { brandOutcome: string }) {
+/** Brand and Markets link to each other once Markets is open; later stages arrive in later builds. */
+export function StageNav({ stages, current }: { stages: Stage[]; current: number }) {
   const [open, setOpen] = useState(false);
-  const items = STAGES.map((s, i) => ({ s, i, outcome: i === 0 ? brandOutcome : "Not started" }));
+  const items: Stage[] = [...stages, ...LATER.map((label) => ({ label, outcome: "Not started" }))];
   return (
     <nav className="stage-nav" aria-label="Stages">
       <button type="button" className="stage-compact" aria-expanded={open} onClick={() => setOpen(!open)}>
-        1 / 5 · Brand <span className="steel">{brandOutcome}</span> ▾
+        {current + 1} / 5 · {items[current].label} <span className="steel">{items[current].outcome}</span> ▾
       </button>
       <ol className={open ? "open" : ""}>
-        {items.map(({ s, i, outcome }) => (
-          <li key={s} className={i === 0 ? "current" : "disabled"} aria-current={i === 0 ? "step" : undefined}
-              title={i === 0 ? undefined : "Arrives in a later build"}>
-            <span className="stage-num">{i + 1}</span>
-            <span className="stage-text">
-              <span className="stage-label">{s}</span>
-              <span className="stage-outcome">{outcome}</span>
-            </span>
-          </li>
-        ))}
+        {items.map((st, i) => {
+          const body = (
+            <>
+              <span className="stage-num">{i < current ? "✓" : i + 1}</span>
+              <span className="stage-text">
+                <span className="stage-label">{st.label}</span>
+                <span className="stage-outcome">{st.outcome}</span>
+              </span>
+            </>
+          );
+          return (
+            <li key={st.label} className={i === current ? "current" : st.href ? "done" : "disabled"}
+                aria-current={i === current ? "step" : undefined} title={st.href || i === current ? undefined : "Arrives in a later build"}>
+              {st.href && i !== current ? <Link to={st.href} className="stage-link">{body}</Link> : body}
+            </li>
+          );
+        })}
       </ol>
     </nav>
   );
