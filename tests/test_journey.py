@@ -1,7 +1,7 @@
 """Integration checks through the real API, replaying the synthetic Tidewell recording (no live calls)."""
 import json
 
-from conftest import SYNTHETIC, wait_for
+from conftest import SYNTHETIC, wait_for, wait_for_identity
 
 from landfall import config, db, runner
 
@@ -21,7 +21,13 @@ def test_url_to_sourced_brief_by_replay(client):
     supported = [f for f in b["facts"] if f["state"] == "SUPPORTED"]
     assert supported and all(f["source"] and f["quote"] for f in supported)
     assert any("cost" in u["label"].lower() or "wholesale" in u["label"].lower() for u in b["unknowns"])
-    assert all(r["status"] in ("DONE", "SKIPPED") for r in v["reading"])
+    qloo_row, *brand_rows = v["reading"]
+    assert all(r["status"] in ("DONE", "SKIPPED") for r in brand_rows)
+    # The synthetic Tidewell set has no Qloo recording: identity is unknown (failed), never "no match", and the
+    # brief still opens (P2-02). A replay miss never becomes a silent live call.
+    v = wait_for_identity(client, pid)
+    assert qloo_row["key"] == "qloo" and v["identity"]["status"] == "failed" and v["identity"]["settled"]
+    assert "no Qloo lookup" in v["identity"]["failure_reason"]
     assert not config.LEDGER_PATH.exists()  # replay made no live attempt
 
 
@@ -66,7 +72,8 @@ def test_projects_are_private_to_the_browser_session(client):
 def test_restart_resumes_without_repeating_completed_steps(client, monkeypatch):
     pid = _demo(client)
     wait_for(client, pid)
-    first = db.q("SELECT id FROM runs WHERE project_id=?", pid)[0]["id"]
+    wait_for_identity(client, pid)
+    first = db.q("SELECT id FROM runs WHERE project_id=? AND kind='brand_read'", pid)[0]["id"]
     # Simulate a crash after the homepage step: reopen the run with only "open" done, then boot.
     db.x("UPDATE runs SET status='running' WHERE id=?", first)
     db.x("DELETE FROM tasks WHERE run_id=? AND task_key<>'open'", first)
@@ -91,6 +98,7 @@ def test_cancel_keeps_completed_work(client):
 def test_budget_exhaustion_stops_live_work_honestly(client, monkeypatch):
     monkeypatch.setattr(config, "PROVIDER_MODE", "live")
     monkeypatch.setattr(config, "CAP_FETCH", 0)
+    monkeypatch.setattr(config, "CAP_QLOO", 0)  # the identity lookup is live work too
     pid = client.post("/api/projects", json={"url": "example.com"}).json()["project_id"]
     v = wait_for(client, pid)
     assert v["run"]["status"] == "partial" and "allowance" in v["run"]["message"]
@@ -101,8 +109,11 @@ def test_unreadable_site_offers_recovery(client, monkeypatch):
     monkeypatch.setattr(config, "PROVIDER_MODE", "live")  # .invalid never resolves: no provider is reached
     pid = client.post("/api/projects", json={"url": "landfall-check.invalid"}).json()["project_id"]
     v = wait_for(client, pid)
-    assert v["run"]["status"] == "needs_input" and "doesn't exist" in v["run"]["message"]
-    assert [r["status"] for r in v["reading"]][:2] == ["FAILED", "SKIPPED"]
+    assert v["run"]["status"] == "needs_input" and "DNS gave no answer" in v["run"]["message"]
+    assert [r["status"] for r in v["reading"]][1:3] == ["FAILED", "SKIPPED"]
+    # D12: the name lookup still runs from the address alone (here the test boundary refuses the live call).
+    v = wait_for_identity(client, pid)
+    assert v["identity"]["site_name"] == "landfall check" and v["identity"]["status"] == "failed"
 
 
 def test_invalid_url_is_rejected_inline(client):

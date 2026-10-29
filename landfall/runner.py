@@ -1,4 +1,5 @@
 """Durable runs and tasks (BUILD-PLAN §3): idempotent steps, restart resume, cancellation, budget-aware status."""
+import functools
 import json
 import threading
 import traceback
@@ -10,7 +11,9 @@ from . import config, db
 from .cassette import Cassette, NoRecording
 from .ledger import BudgetExhausted
 
-EXEC = ThreadPoolExecutor(max_workers=4)
+# ponytail: a plan build waits in its thread. Since 28 Oct 2026 three build at once (autoplan.prewarm): 3 waiting builds
+# + the shortlist + research + 15 investigations fit in 24; an event-driven wait would free those threads if more do.
+EXEC = ThreadPoolExecutor(max_workers=24)
 HANDLERS: dict = {}
 _cancels: dict[str, threading.Event] = {}
 
@@ -69,11 +72,48 @@ def cassette_for(project_id: str) -> Cassette:
     p = db.q("SELECT mode, demo_case FROM projects WHERE id=?", project_id)[0]
     if p["mode"] == "replay":
         return Cassette("replay", replay_dirs=[Path(d) for d in p["demo_case"].split(",")])
+    if config.REPLAY_CASES:  # accepted upstream cases replay; only LIVE_STAGES may go live, and those are recorded
+        return Cassette("replay", config.PRIVATE / "runs" / project_id if config.LIVE_STAGES else None,
+                        replay_dirs=config.REPLAY_CASES, live_stages=config.LIVE_STAGES)
     mode = config.PROVIDER_MODE
     return Cassette(mode, config.PRIVATE / "runs" / project_id if mode == "record" else None)
 
 
+class NotAllowed(Exception):
+    """A live run for a project whose judge or owner link was revoked (or never held one)."""
+
+
+class NotInDemo(NotAllowed):
+    """A recorded demo replays only the steps its recording made (owner, 28 Oct 2026): a choice it didn't record ends
+    here, before any work starts, instead of failing on a missing recording partway through."""
+
+
+DEMO_LINE = ("Not in the recorded demo: the recording didn't make this choice, so it can't be shown here. "
+             "Live research is open to judges through the link they were given.")
+
+
+@functools.lru_cache(maxsize=16)
+def _recorded_runs(case: str) -> frozenset | None:
+    f = Path(case.split(",")[0]) / "case.json"
+    runs = json.loads(f.read_text()).get("runs") if f.exists() else None
+    return None if runs is None else frozenset(runs)
+
+
+def demo_allows(project_id: str, kind: str, input_key: str) -> bool:
+    """True unless the project is a recorded demo whose case lists its runs and this one isn't among them."""
+    p = db.q("SELECT mode, demo_case FROM projects WHERE id=?", project_id)[0]
+    if p["mode"] != "replay" or not p["demo_case"]:
+        return True
+    runs = _recorded_runs(p["demo_case"])
+    return runs is None or f"{kind}:{input_key.replace(project_id, '{pid}')}" in runs
+
+
 def start(project_id: str, kind: str, input_key: str, params: dict | None = None) -> str:
+    from . import grants  # every live run is admitted here, so a revoked link stops new work on its next request
+    if db.q("SELECT 1 FROM projects WHERE id=? AND mode='live'", project_id) and not grants.live_project(project_id):
+        raise NotAllowed("Live research is open through a judge link. This link was revoked or isn't valid.")
+    if not demo_allows(project_id, kind, input_key):
+        raise NotInDemo(DEMO_LINE)
     existing = db.q("SELECT id FROM runs WHERE project_id=? AND kind=? AND input_key=? AND status IN ('queued','running')",
                     project_id, kind, input_key)
     if existing:
@@ -113,8 +153,8 @@ def _execute(run_id: str):
     db.x("UPDATE runs SET status='running' WHERE id=?", run_id)
     run.emit("run", {"status": "running", "run_kind": run.kind})
     try:
-        HANDLERS[run.kind](run)
-        _finish(run, "completed")
+        ended = HANDLERS[run.kind](run)  # a handler may end its run (status, message), e.g. ("partial", "…")
+        _finish(run, *(ended or ("completed",)))
     except Cancelled:
         _finish(run, "cancelled", "Stopped by you. Completed work is kept.")
     except NeedsInput as e:

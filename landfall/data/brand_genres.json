@@ -1,0 +1,86 @@
+{
+ "version": "brand_genres@1",
+ "source": "Qloo /v2/tags genre:brand ids recorded 25 Oct 2026 (P35-12 genres; fashion: QLOO-CAPABILITIES 10.1)",
+ "genres": {
+  "urn:tag:genre:brand:fashion": "Fashion",
+  "urn:tag:genre:brand:fashion:accessories": "Fashion accessories",
+  "urn:tag:genre:brand:food_and_beverage:drinks": "Drinks",
+  "urn:tag:genre:brand:food_and_beverage:food": "Food",
+  "urn:tag:genre:brand:health_and_beauty": "Health & beauty",
+  "urn:tag:genre:brand:fashion:home_accessories": "Home accessories"
+ },
+ "words": [
+  [
+   [
+    "watch",
+    "watches",
+    "sunglasses",
+    "eyewear",
+    "glasses",
+    "jewellery",
+    "jewelry"
+   ],
+   "urn:tag:genre:brand:fashion:accessories"
+  ],
+  [
+   [
+    "homeware",
+    "homewares",
+    "home goods",
+    "candle",
+    "candles"
+   ],
+   "urn:tag:genre:brand:fashion:home_accessories"
+  ],
+  [
+   [
+    "soda",
+    "sodas",
+    "tea",
+    "teas",
+    "coffee",
+    "drink",
+    "drinks",
+    "beverage",
+    "beverages",
+    "juice"
+   ],
+   "urn:tag:genre:brand:food_and_beverage:drinks"
+  ],
+  [
+   [
+    "snack",
+    "snacks",
+    "food",
+    "foods",
+    "chocolate"
+   ],
+   "urn:tag:genre:brand:food_and_beverage:food"
+  ],
+  [
+   [
+    "skincare",
+    "skin care",
+    "cosmetics",
+    "makeup",
+    "beauty"
+   ],
+   "urn:tag:genre:brand:health_and_beauty"
+  ],
+  [
+   [
+    "bag",
+    "bags",
+    "backpack",
+    "backpacks",
+    "apparel",
+    "clothing",
+    "shirt",
+    "shirts",
+    "shoes",
+    "sneakers"
+   ],
+   "urn:tag:genre:brand:fashion"
+  ]
+ ]
+}

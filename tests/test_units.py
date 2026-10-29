@@ -178,3 +178,88 @@ def test_unfinalised_reservation_stays_unresolved_exposure():
 def test_nova_cost_uses_verified_prices():
     assert ledger.nova_cost(1000, 1000) == pytest.approx(0.00033 + 0.00275)
     assert ledger.nova_cost(0, 0, grounding_calls=2) == pytest.approx(0.06)
+    assert ledger.nova_cost(1000, 1000, model="us.amazon.nova-premier-v1:0") == pytest.approx(0.0025 + 0.0125)
+    assert ledger.nova_cost(1000, 1000, model="us.amazon.nova-pro-v1:0") == pytest.approx(0.0008 + 0.0032)
+    with pytest.raises(ValueError):  # an unknown model is never priced as if it were Lite
+        ledger.nova_cost(1000, 1000, model="us.amazon.nova-micro-v1:0")
+
+
+def test_dns_falls_back_to_encrypted_dns_and_keeps_the_address_checks(monkeypatch):
+    """SYNTHETIC: the system resolver fails (as an intercepting network does); DNS over HTTPS answers."""
+    import socket
+
+    from landfall import fetch
+
+    def no_answer(*a, **k):
+        raise socket.gaierror(8, "nodename nor servname provided, or not known")
+    monkeypatch.setattr(fetch.socket, "getaddrinfo", no_answer)
+    monkeypatch.setattr(fetch, "_doh", lambda host: ["45.223.17.132"])
+    assert fetch._resolve("brand.example", 443) == ["45.223.17.132"]
+    connected = []
+    monkeypatch.setattr(fetch.httpcore.SyncBackend, "connect_tcp", lambda self, host, *a, **k: connected.append(host))
+    fetch._GuardedBackend().connect_tcp("brand.example", 443)
+    assert connected == ["45.223.17.132"]  # pinned to the vetted address
+    monkeypatch.setattr(fetch, "_doh", lambda host: ["10.0.0.5"])
+    with pytest.raises(fetch.FetchBlocked):  # a private answer from DoH is refused like any other
+        fetch._GuardedBackend().connect_tcp("brand.example", 443)
+    monkeypatch.setattr(fetch, "_doh", lambda host: [])
+    with pytest.raises(socket.gaierror):  # no answer anywhere: the original failure stands (reported as DNS)
+        fetch._resolve("brand.example", 443)
+
+
+def test_brand_urls_lose_tracking_parameters_and_keep_real_ones():
+    from landfall.ranking import strip_tracking
+    assert strip_tracking("https://untuckit.com/?utm_source=x&utm_medium=y") == "https://untuckit.com/"
+    assert strip_tracking("https://b.com/?mc_cid=a&_ga=1&_gl=2&msclkid=2&igshid=3&ttclid=5&srsltid=6&_hsenc=7&si=8#top") == "https://b.com/"
+    assert strip_tracking("https://b.com/en?lang=fr&variant=2&gclid=1") == "https://b.com/en?lang=fr&variant=2"
+
+
+def test_ad_and_social_redirect_links_resolve_to_the_brand_site():
+    from landfall.ranking import strip_tracking
+    aclk = ("https://www.google.com/aclk?sa=L&ai=DChsSEw&sig=AOD64&q=&adurl=https%3A%2F%2Fwww.untuckit.com%2F%3Futm_source%3D"
+            "brandsearch%26gclid%3DCjw%26gad_source%3D1&ved=2ah")
+    assert strip_tracking(aclk) == "https://www.untuckit.com/"
+    assert strip_tracking("https://l.facebook.com/l.php?u=https%3A%2F%2Fgotbag.com%2F%3Ffbclid%3Dx&h=AT0") == "https://gotbag.com/"
+    assert strip_tracking("https://www.google.com/search?q=untuckit") == "https://www.google.com/search?q=untuckit"  # not a redirect
+
+
+def test_a_prose_answer_instead_of_a_submission_is_recoverable():
+    from landfall.research import _no_submission
+    try:
+        try:
+            raise ValueError("No valid tool use or tool use input was found in the Bedrock response.")
+        except ValueError as inner:
+            raise RuntimeError("agent failed") from inner
+    except RuntimeError as e:
+        assert _no_submission(e)
+    assert not _no_submission(ValueError("something else"))
+
+
+
+def test_a_list_sent_as_malformed_json_is_repaired_for_every_submission():
+    """LIVE 27 Oct 2026: Nova sent `groups` as a JSON string with a stray brace (`…}]}, "qloo_ref"…`), five times."""
+    from landfall.research import Lenient
+
+    class Item(Lenient):
+        name: str
+        ref: str | None = None
+
+    class Sub(Lenient):
+        items: list[Item] = []
+    live_shape = '[{"name": "A", "acts": [{"t": 1}]}, "ref": "Q1"}, {"name": "B"}]'  # the group closed too early
+    got = Sub.model_validate({"items": live_shape}).items
+    assert [(i.name, i.ref) for i in got] == [("A", "Q1"), ("B", None)]
+    assert [i.name for i in Sub.model_validate({"items": '[{"name": "C"}]'}).items] == ["C"]
+
+
+def test_a_throttled_model_call_uses_no_cap(tmp_path):
+    """LIVE 28 Oct 2026: under load, Bedrock 429s were counted as model calls and investigations hit their caps."""
+    import types
+    from landfall import db, research
+    ctx = types.SimpleNamespace(cr="cr_throttle_test", run=types.SimpleNamespace(project_id="prj_t", id="run_t", emit=lambda *a: None),
+                                tokens_in=0)
+    for status in (429, 200):
+        db.x("INSERT INTO research_steps VALUES(?,?,?,?,?,?,?)", ctx.cr, f"usd:{status}", "usd_model", "running", None, 0.01, db.now())
+        research.usage_sink(ctx, "model")({"status": status, "est_usd": 0.0 if status == 429 else 0.002, "input_tokens": 0,
+                                           "output_tokens": 0, "grounding_calls": 0, "replayed": False, "stage": "t"})
+    assert research.counts(ctx.cr)["model"] == 1  # only the call that ran

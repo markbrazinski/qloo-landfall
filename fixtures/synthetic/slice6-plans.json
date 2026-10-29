@@ -1,0 +1,296 @@
+{
+ "label": "SYNTHETIC \u00b7 not provider validated",
+ "plans": {
+  "META_ADS": [
+   {
+    "step": "image",
+    "method": "POST",
+    "url": "https://graph.facebook.com/v24.0/act_123/adimages",
+    "form": {
+     "bytes": "<image bytes from the approved artifact>",
+     "bytes_sha256": "a65bd5ecf11b85b833eedd6b6269a47a0d7b8d634eddfaab85149393026abc04"
+    }
+   },
+   {
+    "step": "campaign",
+    "method": "POST",
+    "url": "https://graph.facebook.com/v24.0/act_123/campaigns",
+    "form": {
+     "name": "Landfall {ref} v2",
+     "objective": "OUTCOME_TRAFFIC",
+     "status": "PAUSED",
+     "special_ad_categories": "[]",
+     "buying_type": "AUCTION",
+     "is_adset_budget_sharing_enabled": "false"
+    }
+   },
+   {
+    "step": "adset",
+    "method": "POST",
+    "url": "https://graph.facebook.com/v24.0/act_123/adsets",
+    "form": {
+     "name": "Landfall {ref} v2 \u00b7 Toronto",
+     "campaign_id": "{{campaign}}",
+     "daily_budget": "834",
+     "billing_event": "IMPRESSIONS",
+     "optimization_goal": "LINK_CLICKS",
+     "bid_strategy": "LOWEST_COST_WITHOUT_CAP",
+     "targeting": "{\"geo_locations\": {\"custom_locations\": [{\"latitude\": 43.7, \"longitude\": -79.4, \"radius\": 20, \"distance_unit\": \"kilometer\"}]}, \"targeting_automation\": {\"advantage_audience\": 0}}",
+     "start_time": "2026-11-02T00:00:00+0000",
+     "status": "PAUSED"
+    }
+   },
+   {
+    "step": "creative",
+    "method": "POST",
+    "url": "https://graph.facebook.com/v24.0/act_123/adcreatives",
+    "form": {
+     "name": "Landfall {ref} v2",
+     "object_story_spec": "{\"page_id\": \"pg1\", \"link_data\": {\"link\": \"http://tidewell.example/\", \"message\": \"Sparkling cold-brewed tea, now on a Toronto waitlist.\", \"name\": \"Sparkling tea in Toronto\", \"image_hash\": \"{{image}}\", \"call_to_action\": {\"type\": \"SIGN_UP\", \"value\": {\"link\": \"http://tidewell.example/\"}}}}"
+    }
+   },
+   {
+    "step": "ad",
+    "method": "POST",
+    "url": "https://graph.facebook.com/v24.0/act_123/ads",
+    "form": {
+     "name": "Landfall {ref} v2",
+     "adset_id": "{{adset}}",
+     "creative": "{\"creative_id\": \"{{creative}}\"}",
+     "status": "PAUSED"
+    }
+   }
+  ],
+  "GOOGLE_ADS": [
+   {
+    "step": "mutate",
+    "method": "POST",
+    "url": "https://googleads.googleapis.com/v26/customers/1234567890/googleAds:mutate",
+    "json": {
+     "mutateOperations": [
+      {
+       "campaignBudgetOperation": {
+        "create": {
+         "resourceName": "customers/1234567890/campaignBudgets/-1",
+         "name": "Landfall {ref} v2 budget",
+         "amountMicros": "8330000",
+         "deliveryMethod": "STANDARD",
+         "explicitlyShared": false
+        }
+       }
+      },
+      {
+       "campaignOperation": {
+        "create": {
+         "resourceName": "customers/1234567890/campaigns/-2",
+         "name": "Landfall {ref} v2",
+         "status": "PAUSED",
+         "advertisingChannelType": "SEARCH",
+         "campaignBudget": "customers/1234567890/campaignBudgets/-1",
+         "targetSpend": {},
+         "networkSettings": {
+          "targetGoogleSearch": true,
+          "targetSearchNetwork": false,
+          "targetContentNetwork": false,
+          "targetPartnerSearchNetwork": false
+         },
+         "containsEuPoliticalAdvertising": "DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING"
+        }
+       }
+      },
+      {
+       "campaignCriterionOperation": {
+        "create": {
+         "campaign": "customers/1234567890/campaigns/-2",
+         "proximity": {
+          "geoPoint": {
+           "latitudeInMicroDegrees": 43700000,
+           "longitudeInMicroDegrees": -79400000
+          },
+          "radius": 20,
+          "radiusUnits": "KILOMETERS"
+         }
+        }
+       }
+      },
+      {
+       "adGroupOperation": {
+        "create": {
+         "resourceName": "customers/1234567890/adGroups/-3",
+         "name": "Landfall {ref} v2 \u00b7 Toronto",
+         "campaign": "customers/1234567890/campaigns/-2",
+         "type": "SEARCH_STANDARD",
+         "status": "PAUSED"
+        }
+       }
+      },
+      {
+       "adGroupCriterionOperation": {
+        "create": {
+         "adGroup": "customers/1234567890/adGroups/-3",
+         "status": "ENABLED",
+         "keyword": {
+          "text": "sparkling tea toronto",
+          "matchType": "PHRASE"
+         }
+        }
+       }
+      },
+      {
+       "adGroupCriterionOperation": {
+        "create": {
+         "adGroup": "customers/1234567890/adGroups/-3",
+         "status": "ENABLED",
+         "keyword": {
+          "text": "canned tea",
+          "matchType": "PHRASE"
+         }
+        }
+       }
+      },
+      {
+       "adGroupAdOperation": {
+        "create": {
+         "adGroup": "customers/1234567890/adGroups/-3",
+         "status": "PAUSED",
+         "ad": {
+          "finalUrls": [
+           "http://tidewell.example/"
+          ],
+          "responsiveSearchAd": {
+           "headlines": [
+            {
+             "text": "Sparkling tea in Toronto"
+            },
+            {
+             "text": "Cold-brewed, lightly fizzy"
+            },
+            {
+             "text": "Try Tidewell"
+            }
+           ],
+           "descriptions": [
+            {
+             "text": "Hibiscus and berry sparkling tea in a can."
+            },
+            {
+             "text": "Join the Toronto waitlist today."
+            }
+           ]
+          }
+         }
+        }
+       }
+      }
+     ],
+     "partialFailure": false,
+     "validateOnly": false
+    }
+   }
+  ],
+  "TIKTOK_ADS": [
+   {
+    "step": "identity",
+    "method": "POST",
+    "url": "https://business-api.tiktok.com/open_api/v1.3/identity/create/",
+    "json": {
+     "advertiser_id": "7001",
+     "display_name": "Tidewell"
+    }
+   },
+   {
+    "step": "image",
+    "method": "POST",
+    "url": "https://business-api.tiktok.com/open_api/v1.3/file/image/ad/upload/",
+    "multipart": {
+     "fields": {
+      "advertiser_id": "7001",
+      "upload_type": "UPLOAD_BY_FILE",
+      "image_signature": "9193d856fadd7bfe7f61fc0da91c1a27"
+     },
+     "file": {
+      "field": "image_file",
+      "sha256": "a65bd5ecf11b85b833eedd6b6269a47a0d7b8d634eddfaab85149393026abc04",
+      "filename": "hibiscus-berry-tea.png",
+      "media_type": "image/png"
+     }
+    }
+   },
+   {
+    "step": "campaign",
+    "method": "POST",
+    "url": "https://business-api.tiktok.com/open_api/v1.3/campaign/create/",
+    "json": {
+     "advertiser_id": "7001",
+     "campaign_name": "Landfall {ref} v2",
+     "objective_type": "TRAFFIC",
+     "budget_mode": "BUDGET_MODE_INFINITE",
+     "operation_status": "DISABLE",
+     "request_id": "{{rid_campaign}}"
+    }
+   },
+   {
+    "step": "adgroup",
+    "method": "POST",
+    "url": "https://business-api.tiktok.com/open_api/v1.3/adgroup/create/",
+    "json": {
+     "advertiser_id": "7001",
+     "campaign_id": "{{campaign}}",
+     "adgroup_name": "Landfall {ref} v2 \u00b7 Toronto",
+     "promotion_type": "WEBSITE",
+     "placement_type": "PLACEMENT_TYPE_NORMAL",
+     "placements": [
+      "PLACEMENT_PANGLE"
+     ],
+     "location_ids": [
+      "6167865"
+     ],
+     "budget_mode": "BUDGET_MODE_DAY",
+     "budget": 8.33,
+     "schedule_type": "SCHEDULE_FROM_NOW",
+     "schedule_start_time": "2026-11-02 00:00:00",
+     "optimization_goal": "CLICK",
+     "billing_event": "CPC",
+     "bid_type": "BID_TYPE_NO_BID",
+     "pacing": "PACING_MODE_SMOOTH",
+     "operation_status": "DISABLE",
+     "request_id": "{{rid_adgroup}}"
+    }
+   },
+   {
+    "step": "ad",
+    "method": "POST",
+    "url": "https://business-api.tiktok.com/open_api/v1.3/ad/create/",
+    "json": {
+     "advertiser_id": "7001",
+     "adgroup_id": "{{adgroup}}",
+     "creatives": [
+      {
+       "ad_name": "Landfall {ref} v2",
+       "identity_type": "CUSTOMIZED_USER",
+       "identity_id": "{{identity}}",
+       "ad_format": "SINGLE_IMAGE",
+       "image_ids": [
+        "{{image}}"
+       ],
+       "ad_text": "Sparkling cold-brewed tea for Toronto.",
+       "call_to_action": "SIGN_UP",
+       "landing_page_url": "http://tidewell.example/",
+       "operation_status": "DISABLE"
+      }
+     ]
+    }
+   }
+  ],
+  "EMAIL": [
+   {
+    "step": "message",
+    "method": "POST",
+    "url": "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
+    "json": {
+     "raw": "<mime>"
+    }
+   }
+  ]
+ }
+}

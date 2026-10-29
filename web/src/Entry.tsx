@@ -1,129 +1,103 @@
-import { type FormEvent, useMemo, useState } from "react";
-import { api } from "./api";
-import { Chip, Lockup } from "./ui";
+import { type FormEvent, useEffect, useMemo, useState } from "react";
+import { api, type Purpose, type Scope, sessionTrack, type SessionTrack } from "./api";
+import "./brand.css";
+import { GoalSentence, PURPOSES, SCOPES, usd } from "./Goal";
 
+// v4 01: stage · name · what they do · what you get
 const TEAM = [
-  ["Brand reader", "01 Brand", "Reads your public site and separates what it says from what we infer.", "A brief you can correct, with sources"],
-  ["Market scout", "02 Markets", "Uses Qloo cultural relationships to find places related to your brand in up to 80 cities.", "A few cities worth a closer look, with reasons"],
-  ["Researcher", "03 Opportunities", "Checks each lead against its own site and independent sources, and keeps failed checks visible.", "Verified local partners and what is still unknown"],
-  ["Strategist", "03–04", "Develops launch options and compares them on the same terms.", "A recommendation, an alternative and the trade-offs"],
-  ["Analyst", "04–05", "Estimates costs for each launch option, separating cash, deposits and expense, and shows assumptions.", "Labelled costs and what you would need to pay out"],
-  ["Creative & outreach", "05 Pursue", "Makes the launch tangible and drafts the first message to a partner.", "A campaign kit and an inquiry for you to approve"],
+  ["01 Brand", "Brand reader", "Reads your public site and separates what it says from what we infer.", "A brief you can correct, with sources"],
+  ["02 Markets", "Market scout", "Uses Qloo cultural relationships to find places related to your brand across 80 cities.", "One recommended city, two alternatives, and why"],
+  ["03 Plan", "Method specialists", "Check retail, pop-up, creator, community and digital leads against their own sources.", "Real candidates, and what’s still unknown"],
+  ["03 Plan", "Planner", "Combines the strongest methods into one entry plan within your budget.", "A recommended plan, an alternative and the trade-offs"],
+  ["04 Prepare", "Creative & outreach", "Drafts the messages, shelf materials and ads for each method.", "A launch kit to review and edit"],
+  ["05 Act & adapt", "Delivery", "Sends what you approve where it can, and gives you everything to use yourself where it can’t.", "A record of what went out, and the next step after a reply"],
 ];
-const BUILT = [
-  ["QLOO", "Cultural relationships", "Which places relate to your brand's taste. Not demand."],
-  ["SOURCE", "Independent research", "Whether a place exists and what it says about itself."],
-  ["TEAM READ", "Reasoning", "Approaches and how they compare."],
-  ["CALC", "Calculations", "Costs, cash needed and what is assumed."],
-  ["DRAFT", "Creative work", "Previews and copy you can show a partner."],
-];
+
+// Owner, 28 Oct 2026: the demo track replays two real brands, recorded end to end with the default goal (fixtures/demo/).
+const DEMOS = [
+  ["deathwishcoffee", "Death Wish Coffee", "deathwishcoffee.com · coffee"],
+  ["untuckit", "UNTUCKit", "untuckit.com · shirts and apparel"],
+] as const;
 
 export default function Entry() {
   const [url, setUrl] = useState("");
-  const [adv, setAdv] = useState(false);
-  const [fields, setFields] = useState({ objective: "Explore where to expand for me", ceiling: "", include: "", exclude: "" });
+  const [ceiling, setCeiling] = useState<number | null>(null);  // null: untouched, so the server records the default
+  const [goal, setGoal] = useState<{ scope: Scope; purpose: Purpose }>({ scope: "international", purpose: "test_demand" });
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const idem = useMemo(() => crypto.randomUUID(), []);
+  // A1 (owner, 27 Oct 2026): a judge or owner link gets live research; everyone else gets the recorded demo.
+  const [track, setTrack] = useState<SessionTrack["track"] | null>(null);
+  useEffect(() => { sessionTrack().then((s) => setTrack(s.track), () => setTrack("live")); }, []);
+  const demo = track === "demo";
+  const [demoCase, setDemoCase] = useState<string>(DEMOS[0][0]);
 
-  const start = async (body: object) => {
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!demo && !url.trim()) return setError("Enter your brand’s website to start.");
     setBusy(true);
     setError(null);
     try {
-      const { project_id } = await api.create(body, idem);
+      const target = demo ? { demo: true, demo_case: demoCase } : { url };
+      const { project_id } = await api.create({ ...target, ...goal, ...(ceiling ? { ceiling_usd: ceiling } : {}) }, idem);
       window.location.assign(`/p/${project_id}`);
-    } catch (e) {
-      setError((e as Error).message);
+    } catch (x) {
+      setError((x as Error).message);
       setBusy(false);
     }
   };
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    start({
-      url, objective: fields.objective, ceiling_usd: fields.ceiling ? Number(fields.ceiling) : null,
-      include: fields.include || null, exclude: fields.exclude || null,
-    });
-  };
-  const set = (k: keyof typeof fields) => (e: { target: { value: string } }) => setFields({ ...fields, [k]: e.target.value });
 
   return (
-    <div className="app">
-      <header className="entry-header"><Lockup /></header>
-      <main className="entry">
-        <section className="entry-left">
-          <h1 className="display">Your next market. A team to get you started.</h1>
-          <p className="lede">Give us your website. Your team works out where you could expand, what you could try there, and helps you take the first step. You make every call that matters.</p>
-          <form className="intake card-frame" onSubmit={submit} noValidate>
-            <label htmlFor="url" className="field-title">Your brand's website</label>
-            <input id="url" className="input input-lg" placeholder="yourbrand.com" value={url} autoComplete="url"
-                   onChange={(e) => setUrl(e.target.value)} aria-invalid={!!error} aria-describedby={error ? "url-error" : undefined} />
-            {error && <p id="url-error" className="field-error">{error}</p>}
-            <button type="submit" className="btn-primary btn-block" disabled={busy || !url.trim()}>
-              {busy ? "Starting…" : "Start exploring"}
-            </button>
-            <p className="small steel">We read public pages only. Nothing is sent or published on your behalf.</p>
-            <div className="demo-row">
-              <span className="label steel">OR TRY A DEMO</span>
-              <button type="button" className="pill" onClick={() => start({ demo: true })} disabled={busy}>
-                Tidewell · sparkling cold-brewed tea
-              </button>
-            </div>
-            <div className="default-box">
-              <Chip label="DEFAULT" /> <strong>Explore where to expand for me</strong>
-              <p className="small steel">No budget, objective or location needed. We ask only when one would change a decision.</p>
-            </div>
-            <button type="button" className="link" aria-expanded={adv} onClick={() => setAdv(!adv)}>
-              {adv ? "Hide advanced options" : "Advanced options (all optional)"}
-            </button>
-            {adv && (
-              <div className="adv-grid">
-                <label>Objective
-                  <select className="input" value={fields.objective} onChange={set("objective")}>
-                    <option>Explore where to expand for me</option>
-                    <option>Test demand in a new country</option>
-                    <option>Find retail partners abroad</option>
-                  </select>
-                </label>
-                <label>Most you'd spend
-                  <input className="input" inputMode="numeric" placeholder="Not set" value={fields.ceiling}
-                         onChange={(e) => setFields({ ...fields, ceiling: e.target.value.replace(/\D/g, "") })} />
-                </label>
-                <label>Include places<input className="input" placeholder="Anywhere" value={fields.include} onChange={set("include")} /></label>
-                <label>Leave out<input className="input" placeholder="None" value={fields.exclude} onChange={set("exclude")} /></label>
-                <p className="small steel span2">Saved with your brief as your intent. They shape later stages.</p>
+    <main className="lfb-intake-page">
+      <div className="lfb-intake-lockup"><a href="/" aria-label="Landfall home"><img src="/lockup.svg" alt="landfall" height={26} /></a></div>
+      <div className="lfb-intake">
+        <section className="lfb-intake-left">
+          <h1 className="lfb-intake-h1">Your next market. A team to get you started.</h1>
+          <p className="lfb-intake-lede">Give us your website. Your team works out where you could expand, what you could try there, and helps you take the first step. You make every call that matters.</p>
+          {track && <form className="lfb-intake-form" onSubmit={submit} noValidate>
+            {demo
+              ? <div className="stack" role="radiogroup" aria-label="Recorded demo">
+                <p className="lfb-intake-lede">Choose a brand. Each is a full recorded run, from the brief to Act &amp; adapt. Live research is open to judges through the link they were given.</p>
+                {DEMOS.map(([k, name, sub]) => (
+                  <label key={k} className={`prep-option ${demoCase === k ? "on" : ""}`}>
+                    <input type="radio" name="demo-case" checked={demoCase === k} onChange={() => setDemoCase(k)} />
+                    <span className="prep-option-body">
+                      <span className="prep-option-name"><b>{name}</b><span className="chip chip-proposal">RECORDED</span></span>
+                      <span className="steel">{sub}</span>
+                      <span className="mono steel">Recorded demo · replayed, nothing live</span>
+                    </span>
+                  </label>
+                ))}
               </div>
-            )}
-          </form>
+              : <label className="lfb-url">
+                <span>Your brand's website</span>
+                <input id="url" placeholder="yourbrand.com" value={url} autoComplete="url" onChange={(e) => setUrl(e.target.value)}
+                  aria-invalid={!!error} aria-describedby={error ? "url-error" : undefined} />
+              </label>}
+            {error && <p id="url-error" className="field-error" role="alert">{error}</p>}
+            {demo  // the recordings ran with the default goal; a replay can only follow it
+              ? <p className="lfb-sentence">I'd like to expand {SCOPES[0][1]} to {PURPOSES[0][1]} with a starting budget of {usd(10000)}.</p>
+              : <GoalSentence scope={goal.scope} purpose={goal.purpose} onChange={(c) => setGoal({ ...goal, ...c })}
+                ceiling={ceiling ?? 10000} onCeiling={setCeiling} />}
+            <button type="submit" className="btn-primary btn-block" disabled={busy}>{busy ? "Starting…" : demo ? "Start the demo" : "Start exploring"}</button>
+            <span className="mono steel">{demo ? "Replayed from a recording: no live calls, nothing goes out." : "We read public pages only. Nothing goes out until you approve it."}</span>
+          </form>}
         </section>
-        <section className="entry-right">
-          <div className="label steel">MEET YOUR TEAM</div>
-          <h2 className="title">Six specialists working from one brief</h2>
-          <p className="steel">Each one owns a piece of the work and hands you something you can use. They work in the background; you see results and the occasional question.</p>
-          <div className="team-grid">
-            {TEAM.map(([name, step, does, gets]) => (
-              <div className="card team-card" key={name}>
-                <div className="team-top"><h3>{name}</h3><span className="mono steel">{step}</span></div>
+        <section className="lfb-intake-right">
+          <span className="label steel">Meet your team</span>
+          <h2 className="lfb-team-h2">Six specialists working from one brief</h2>
+          <p className="steel">Each owns a piece of the work and hands you something you can use. They work in the background; you see results and the occasional question.</p>
+          <div className="lfb-team">
+            {TEAM.map(([stage, name, does, gets]) => (
+              <div className="lfb-team-card" key={name}>
+                <div><span className="mono steel">{stage}</span><h3>{name}</h3></div>
                 <p>{does}</p>
-                <div className="team-gets"><div className="label steel">YOU GET</div><p>{gets}</p></div>
+                <div className="lfb-team-gets"><span className="label steel">You get</span><span>{gets}</span></div>
               </div>
             ))}
           </div>
-          <div className="card built">
-            <div className="built-head"><h3>How a recommendation is built</h3><span className="small steel">Each step is labelled wherever its results appear.</span></div>
-            <div className="built-grid">
-              {BUILT.map(([chip, t, d]) => (
-                <div key={t}><Chip label={chip} /><h4>{t}</h4><p className="small steel">{d}</p></div>
-              ))}
-            </div>
-          </div>
-          <ul className="promises">
-            <li>Nothing is sent or published without your approval.</li>
-            <li>Unknowns stay beside the decision, never counted as zero.</li>
-            <li>Every claim opens its source.</li>
-          </ul>
-          <p className="mono steel small">The demo uses Tidewell, a fictional brand, with recorded data. Results depend on your brand and what each source returns.</p>
         </section>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }

@@ -1,0 +1,14 @@
+{
+  "version": "templates@2",
+  "note": "Standard outreach templates, one per method (owner, 28 Oct 2026: start from good templates, then enrich). They state nothing about the brand except through merge fields, which are filled only from records; questions and proposals claim nothing. The Launch checklist fills one as soon as the recipient is known, then one model pass enriches it in the background.",
+  "starters": {
+    "retail": {"name": "Shelf trial inquiry", "subject": "A small shelf trial of {brand} at {recipient_name}?",
+      "body": "Hello {recipient_name} team,\n\nWe're writing from {brand}. We're looking for a first shop in {city} to try our products with, and yours is the one we'd most like to start with.\n\nWhat we'd propose: {concept}\n\nTo keep it small, we'd start with a trial of {products}, on whichever terms suit you best, such as sale or return or a small first order.\n\nWould you be open to trying it? If so, who looks after new products, and would a sample drop or a short call next week suit you?\n\nThank you, {sender_name}"},
+    "popup": {"name": "Pop-up space inquiry", "subject": "A short pop-up at {recipient_name}?",
+      "body": "Hello {recipient_name} team,\n\nWe're writing from {brand}. We're planning a first, short pop-up in {city} and wondered whether your space could host it.\n\nWhat we have in mind: {concept}\n\nWe'd bring {products}, and set up and clear away ourselves.\n\nCould you tell us whether you host pop-ups like this, which dates in the next few weeks might be free, and what the fee and terms would be?\n\nThank you, {sender_name}"},
+    "creator": {"name": "Creator collaboration inquiry", "subject": "{brand} x {recipient_name}?",
+      "body": "Hi {recipient_name},\n\nWe're writing from {brand}. We're starting out in {city} and your account is the one we'd most like to work with.\n\nThe idea: {concept}\n\nWe'd love to send you {products} to try first, with no obligation to post.\n\nIf you like them, would you be open to a paid collaboration? Could you share how you usually work with brands, and your rates?\n\nThank you, {sender_name}"},
+    "community": {"name": "Community collaboration inquiry", "subject": "{brand} and {recipient_name}: something together?",
+      "body": "Hello {recipient_name},\n\nWe're writing from {brand}. We're getting to know {city} and wondered whether your group would like to do something together.\n\nWhat we have in mind: {concept}\n\nWe'd bring {products} for your members to try, at no cost to the group.\n\nWould this suit your members? If so, which upcoming meet-up might fit, and who should we talk to about it?\n\nThank you, {sender_name}"}
+  }
+}

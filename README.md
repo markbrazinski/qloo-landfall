@@ -5,8 +5,10 @@
 Give Landfall a brand's website. Its team reads the brand, finds where in the world it belongs (with Qloo's cultural
 relationships), proposes ways in, compares first launch tests, and prepares the outreach. The founder makes every call.
 
-**Status (23 Oct 2026): slice 1 of 8 works.** URL → a real, sourced brand brief in the designed UI, with corrections,
-persistence, unreadable-site recovery and inspectable Activity. Markets onward are later slices
+**Status (24 Oct 2026): slice 3 of 8 built, in review.** URL → a real, sourced brand brief → which Qloo brand you are
+(matched automatically when only one confident match exists, otherwise asked while reading) or an editable discovery
+profile of Qloo tags you confirm → 80 cities scanned with Qloo (one search per city, coverage shown honestly) → an
+explained shortlist of up to six cities you can adjust. City research onward is later slices
 ([`docs/BUILD-PLAN.md`](docs/BUILD-PLAN.md)).
 
 ## Try it
@@ -18,6 +20,8 @@ make setup      # uv sync, npm install, Playwright's Chromium
 make demo       # http://localhost:8003 · replays a recorded demo; no credentials, no provider calls
 make test       # unit + integration checks (replay)
 make e2e        # browser journey against the replay demo
+make e2e-cases  # slice-2 journeys replaying the private live cases (owner's machine only)
+make e2e-slice3 # slice-3 journeys replaying the private live cases into a fresh database (owner's machine only)
 ```
 
 Live mode reads real sites with Amazon Nova 2 Lite on Bedrock and spends against the operating allowance:
@@ -44,7 +48,8 @@ Landfall prepares and exports; it never sends, publishes, books or pays.
 
 | Path | Purpose |
 |---|---|
-| `landfall/` | API, runner, Brand reader stage, providers (fetch, Nova, Qloo), ledger, cassette |
+| `landfall/` | API, runner, Brand reader, identity/profile, scan and shortlist stages, providers (fetch, Nova, Qloo), ledger, cassette |
+| `landfall/data/` | Packaged reference data: the 80-city catalog, countries and the EU set, a GeoNames gazetteer subset |
 | `web/` | Frontend |
 | `fixtures/synthetic/` | Fictional Tidewell site and its recorded (synthetic) brand read: the public demo |
 | `scripts/` | Provider probes, browser journey, case locking |
@@ -52,7 +57,9 @@ Landfall prepares and exports; it never sends, publishes, books or pays.
 | `design/` | The supplied Claude Design handoff (visual reference) |
 | `docs/` | Product brief, SOP, Build Book |
 
-MIT licensed (original code); see [`LICENSE`](LICENSE) for third-party material.
+MIT licensed (original code); see [`LICENSE`](LICENSE) for third-party material. City and country reference data are
+derived from [GeoNames](https://www.geonames.org) (CC BY 4.0); the world map uses world-atlas (Natural Earth, public
+domain). `scripts/build_reference.py` rebuilds the data from the GeoNames dumps.
 
 ## Previous implementation (reference only)
 

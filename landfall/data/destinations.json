@@ -1,0 +1,440 @@
+{
+ "version": "destinations@1",
+ "source": "recorded R3 + P35-12 searches, 25 Oct 2026",
+ "duplicates": [
+  "new-york",
+  "amsterdam",
+  "barcelona",
+  "helsinki",
+  "vienna",
+  "kuala-lumpur",
+  "jakarta",
+  "ho-chi-minh-city",
+  "shanghai",
+  "mumbai",
+  "bengaluru",
+  "buenos-aires",
+  "santiago",
+  "medellin",
+  "rio-de-janeiro",
+  "monterrey",
+  "johannesburg",
+  "doha"
+ ],
+ "cities": {
+  "toronto": {
+   "qloo_id": "90234FAB-571C-4DAC-86F3-E85C3FDE5136",
+   "name": "Toronto",
+   "pick_reason": "same name, 5.9 km from the catalog point"
+  },
+  "vancouver": {
+   "qloo_id": "8F53B161-575F-455C-B196-10F81B610995",
+   "name": "Vancouver",
+   "pick_reason": "same name, 2.5 km from the catalog point"
+  },
+  "chicago": {
+   "qloo_id": "48C1C6E6-525E-4240-A7CD-6A69B0225D16",
+   "name": "Chicago",
+   "pick_reason": "same name, 3.3 km from the catalog point"
+  },
+  "montreal": {
+   "qloo_id": "12E01E5C-0C16-4B51-B2FC-C46F63C3AF77",
+   "name": "Montreal",
+   "pick_reason": "same name, 2.0 km from the catalog point"
+  },
+  "new-york": {
+   "qloo_id": "A888626E-4FB4-4260-B948-056C875A65BA",
+   "name": "New York",
+   "pick_reason": "same name, 1.7 km from the catalog point; nearest, then higher popularity, of 2",
+   "alternative_id": "99FB5527-DACF-42DF-816B-36B5D004F639"
+  },
+  "los-angeles": {
+   "qloo_id": "DD04DACD-A8FC-44FC-9A50-F3FDCE35FB43",
+   "name": "Los Angeles",
+   "pick_reason": "same name, 7.0 km from the catalog point"
+  },
+  "san-francisco": {
+   "qloo_id": "3718EB5F-11B0-44AE-AC0D-D386522D370D",
+   "name": "San Francisco",
+   "pick_reason": "same name, 2.8 km from the catalog point"
+  },
+  "seattle": {
+   "qloo_id": "0E15C46B-F348-4569-AA3D-50D4372CB134",
+   "name": "Seattle",
+   "pick_reason": "same name, 2.4 km from the catalog point"
+  },
+  "austin": {
+   "qloo_id": "F3E1B4AF-87AD-43AE-A082-0380D8538DAD",
+   "name": "Austin",
+   "pick_reason": "same name, 5.8 km from the catalog point"
+  },
+  "denver": {
+   "qloo_id": "D87E0EEF-6976-43B3-9F77-F9E7E86A380E",
+   "name": "Denver",
+   "pick_reason": "same name, 4.6 km from the catalog point"
+  },
+  "boston": {
+   "qloo_id": "32DECF27-D374-48AD-BCBF-4032A9DE4551",
+   "name": "Boston",
+   "pick_reason": "same name, 5.9 km from the catalog point"
+  },
+  "minneapolis": {
+   "qloo_id": "E383508C-82EB-455F-B35F-B20F572871B1",
+   "name": "Minneapolis",
+   "pick_reason": "same name, 3.8 km from the catalog point"
+  },
+  "mexico-city": {
+   "qloo_id": "98B97D1C-9BC8-40EA-A3AC-831A83D0A8A4",
+   "name": "Mexico City",
+   "pick_reason": "same name, 5.0 km from the catalog point"
+  },
+  "philadelphia": {
+   "qloo_id": "182F18D8-7E24-4BAC-BC47-75CC284C4777",
+   "name": "Philadelphia",
+   "pick_reason": "same name, 6.0 km from the catalog point"
+  },
+  "washington-dc": {
+   "qloo_id": "76AC9341-14AC-475A-A17A-8C530FD6BABA",
+   "name": "Washington",
+   "pick_reason": "same name, 3.2 km from the catalog point"
+  },
+  "calgary": {
+   "qloo_id": "787DCDFA-FF0E-4BAB-85B9-D96EDF33546A",
+   "name": "Calgary",
+   "pick_reason": "same name, 6.4 km from the catalog point"
+  },
+  "london": {
+   "qloo_id": "29D176AB-418C-4A6D-B4DA-18E1A9D5FC72",
+   "name": "London",
+   "pick_reason": "same name, 2.0 km from the catalog point"
+  },
+  "copenhagen": {
+   "qloo_id": "82DCD455-A5AB-42D0-B390-11218B0C7FF0",
+   "name": "Copenhagen",
+   "pick_reason": "same name, 3.3 km from the catalog point"
+  },
+  "paris": {
+   "qloo_id": "70E3820A-B1CF-4676-9CDA-C5F6539C53B9",
+   "name": "Paris",
+   "pick_reason": "same name, 4.8 km from the catalog point"
+  },
+  "berlin": {
+   "qloo_id": "3B132477-9818-4087-9100-A74128389F09",
+   "name": "Berlin",
+   "pick_reason": "same name, 2.0 km from the catalog point"
+  },
+  "amsterdam": {
+   "qloo_id": "4D5C88B0-E1D0-4DAD-838A-EE94592479C1",
+   "name": "Amsterdam",
+   "pick_reason": "same name, 2.5 km from the catalog point; nearest, then higher popularity, of 2",
+   "alternative_id": "9DB26660-90E8-4BF2-84B5-B4C3E1164A78"
+  },
+  "lisbon": {
+   "qloo_id": "F5031AA6-799B-4FC7-B38F-E23F14F1ED4C",
+   "name": "Lisbon",
+   "pick_reason": "same name, 4.5 km from the catalog point"
+  },
+  "barcelona": {
+   "qloo_id": "426B5872-421C-4831-BEDD-89BCCD5474B2",
+   "name": "Barcelona",
+   "pick_reason": "same name, 2.9 km from the catalog point; nearest, then higher popularity, of 2",
+   "alternative_id": "84066C02-FBE0-4DFF-BCF7-810FE91BAC47"
+  },
+  "madrid": {
+   "qloo_id": "E8E8B7BB-3BF0-42E2-89EF-7A75F902B0B9",
+   "name": "Madrid",
+   "pick_reason": "same name, 1.4 km from the catalog point"
+  },
+  "stockholm": {
+   "qloo_id": "67B1EA06-A470-400C-82D3-40C778A75693",
+   "name": "Stockholm",
+   "pick_reason": "same name, 4.1 km from the catalog point"
+  },
+  "oslo": {
+   "qloo_id": "7B015DCA-2F27-4680-9DE1-29E943E499BD",
+   "name": "Oslo",
+   "pick_reason": "same name, 3.2 km from the catalog point"
+  },
+  "helsinki": {
+   "qloo_id": "EC56C78C-2A0D-4E7A-B0AE-F89E33032049",
+   "name": "Helsinki",
+   "pick_reason": "same name, 3.9 km from the catalog point; nearest, then higher popularity, of 2",
+   "alternative_id": "AAC00E71-BB8C-4384-B6AF-A30244B9D62D"
+  },
+  "dublin": {
+   "qloo_id": "4F4523C1-0313-4583-9BDD-36A7A0D4B3C2",
+   "name": "Dublin",
+   "pick_reason": "same name, 6.0 km from the catalog point"
+  },
+  "manchester": {
+   "qloo_id": "D33B11BB-6DB2-4ADB-8A48-117B7DF82BFE",
+   "name": "Manchester",
+   "pick_reason": "same name, 3.8 km from the catalog point"
+  },
+  "edinburgh": {
+   "qloo_id": "A75E2277-6EDF-4E18-831C-096E806E51AE",
+   "name": "Edinburgh",
+   "pick_reason": "same name, 0.7 km from the catalog point"
+  },
+  "vienna": {
+   "qloo_id": "CE53685B-2B9B-4D29-B0CA-9C7DDDB93E32",
+   "name": "Vienna",
+   "pick_reason": "same name, 2.2 km from the catalog point; nearest, then higher popularity, of 2",
+   "alternative_id": "5DF2DCD1-6A55-41B1-ABA7-E315307BFC7F"
+  },
+  "zurich": {
+   "qloo_id": "684FE52E-569C-4A09-B728-A9D2B921AED8",
+   "name": "Zürich",
+   "pick_reason": "same name, 2.9 km from the catalog point"
+  },
+  "milan": {
+   "qloo_id": "9DD8CBA6-6B1D-4FBB-A98C-FF0A70E6C0CF",
+   "name": "Milan",
+   "pick_reason": "same name, 4.1 km from the catalog point"
+  },
+  "munich": {
+   "qloo_id": "E2440951-C135-470B-B8AA-95D43B5D5C0D",
+   "name": "Munich",
+   "pick_reason": "same name, 5.7 km from the catalog point"
+  },
+  "brussels": {
+   "qloo_id": "005AE488-9712-4637-BB28-E646DCBD0BD8",
+   "name": "Brussels",
+   "pick_reason": "same name, 0.0 km from the catalog point"
+  },
+  "prague": {
+   "qloo_id": "F212B2AD-F90C-4E11-8D92-78D92A5E25C4",
+   "name": "Prague",
+   "pick_reason": "same name, 2.1 km from the catalog point"
+  },
+  "warsaw": {
+   "qloo_id": "5A292E36-8FA7-4E85-9869-B441EAC9C04A",
+   "name": "Warsaw",
+   "pick_reason": "same name, 5.6 km from the catalog point"
+  },
+  "hamburg": {
+   "qloo_id": "DFA1ECB1-172B-4AB7-9D66-80C083FA2039",
+   "name": "Hamburg",
+   "pick_reason": "same name, 0.1 km from the catalog point"
+  },
+  "melbourne": {
+   "qloo_id": "4AADFCE6-7B4F-4FDA-9C42-F0CFD302E80E",
+   "name": "Melbourne",
+   "pick_reason": "same name, 3.4 km from the catalog point"
+  },
+  "sydney": {
+   "qloo_id": "B1C94C52-9960-429E-B89B-EA2F1DE9C902",
+   "name": "Sydney",
+   "pick_reason": "same name, 3.7 km from the catalog point"
+  },
+  "auckland": {
+   "qloo_id": "6D482CAA-71AE-4F67-A02A-95071315E686",
+   "name": "Auckland",
+   "pick_reason": "same name, 6.1 km from the catalog point"
+  },
+  "tokyo": {
+   "qloo_id": "1EB0550F-0F82-43A2-B501-4D33B5488FD1",
+   "name": "Tokyo",
+   "pick_reason": "same name, 6.7 km from the catalog point"
+  },
+  "osaka": {
+   "qloo_id": "F029733F-33DD-4188-AB01-23392AA93CA9",
+   "name": "Osaka",
+   "pick_reason": "same name, 4.6 km from the catalog point"
+  },
+  "seoul": {
+   "qloo_id": "AA6F2D58-008A-4FC8-B374-C103D4D86B16",
+   "name": "Seoul",
+   "pick_reason": "same name, 9.6 km from the catalog point"
+  },
+  "singapore": {
+   "qloo_id": "8F0879FD-0B05-448C-AD2B-A95F785E7F13",
+   "name": "Singapore",
+   "pick_reason": "same name, 8.9 km from the catalog point"
+  },
+  "hong-kong": {
+   "qloo_id": "749B37F4-B309-48C1-A12B-A1A83B0CD600",
+   "name": "Hong Kong",
+   "pick_reason": "same name, 4.7 km from the catalog point"
+  },
+  "taipei": {
+   "qloo_id": "4235EA4D-28AC-436F-BDBC-2E7C03E07932",
+   "name": "Taipei",
+   "pick_reason": "same name, 6.1 km from the catalog point"
+  },
+  "bangkok": {
+   "qloo_id": "F26292E6-232E-4316-8456-57A57860F5CF",
+   "name": "Bangkok",
+   "pick_reason": "same name, 0.7 km from the catalog point"
+  },
+  "brisbane": {
+   "qloo_id": "455B11E1-2A63-4B2C-994B-08E5FAD9C2D1",
+   "name": "Brisbane",
+   "pick_reason": "same name, 4.5 km from the catalog point"
+  },
+  "perth": {
+   "qloo_id": "533BAF3A-4863-490A-8D46-54DC98C425F0",
+   "name": "Perth",
+   "pick_reason": "same name, 6.6 km from the catalog point"
+  },
+  "wellington": {
+   "unmapped": "no Qloo destination with this name near the city (P35-12)"
+  },
+  "kuala-lumpur": {
+   "qloo_id": "250EA0EE-DC2C-4C7E-B26E-E8F7CE25100D",
+   "name": "Kuala Lumpur",
+   "pick_reason": "same name, 6.6 km from the catalog point; nearest, then higher popularity, of 2",
+   "alternative_id": "A58CAF6F-0B83-4DEF-AD19-19D23B4D104C"
+  },
+  "manila": {
+   "qloo_id": "D57F9DE7-D6D9-467E-A73E-5BBBD910B952",
+   "name": "Manila",
+   "pick_reason": "same name, 2.4 km from the catalog point"
+  },
+  "jakarta": {
+   "qloo_id": "E6C54778-3155-4A09-9534-2C0D181BE627",
+   "name": "Jakarta",
+   "pick_reason": "same name, 3.4 km from the catalog point; nearest, then higher popularity, of 2",
+   "alternative_id": "163DD32F-1F3B-40AB-8465-EB6045172519"
+  },
+  "ho-chi-minh-city": {
+   "qloo_id": "BC1B0D1B-B3C6-471C-A532-F094B9635CBF",
+   "name": "Ho Chi Minh City",
+   "pick_reason": "same name, 3.9 km from the catalog point; nearest, then higher popularity, of 2",
+   "alternative_id": "739D4C98-C392-4092-B1DC-F9D0247F24AE"
+  },
+  "shanghai": {
+   "qloo_id": "27D3CEF0-374A-455F-A2DD-AF4B21606DF4",
+   "name": "Shanghai",
+   "pick_reason": "same name, 0.0 km from the catalog point; nearest, then higher popularity, of 2",
+   "alternative_id": "BB9B6118-1EB5-40A0-B933-C627924C23EA"
+  },
+  "mumbai": {
+   "qloo_id": "95C14EAA-284D-468F-8AFF-42DCE47EA15C",
+   "name": "Mumbai",
+   "pick_reason": "same name, 4.8 km from the catalog point; nearest, then higher popularity, of 2",
+   "alternative_id": "5F3EE430-10A8-4045-8232-14C4EDA0F286"
+  },
+  "bengaluru": {
+   "qloo_id": "576353F3-7E57-4B1A-8BFF-F5F597881033",
+   "name": "Bangalore",
+   "pick_reason": "same name, 3.2 km from the catalog point; nearest, then higher popularity, of 2",
+   "alternative_id": "4E70EAF2-8549-42CD-9816-147F56EB8F76"
+  },
+  "sao-paulo": {
+   "qloo_id": "BC2832ED-AC58-42BA-8DD5-A79BF602FF69",
+   "name": "São Paulo",
+   "pick_reason": "same name, no location: accepted by exact name (P35-12)"
+  },
+  "buenos-aires": {
+   "qloo_id": "1F5F3E30-063A-4949-805E-5764A4A1BEAE",
+   "name": "Buenos Aires",
+   "pick_reason": "same name, 2.6 km from the catalog point; nearest, then higher popularity, of 2",
+   "alternative_id": "816C3E9B-EDB1-498E-8744-8F569497658C"
+  },
+  "santiago": {
+   "qloo_id": "4B84A753-7EDD-4BFC-BC79-61D684096928",
+   "name": "Santiago",
+   "pick_reason": "same name, 8.3 km from the catalog point; nearest, then higher popularity, of 2",
+   "alternative_id": "BD53FCBA-888E-4ED4-BA11-15555A7EB427"
+  },
+  "bogota": {
+   "qloo_id": "0F2B33A7-8FEF-4A7B-8F66-D9B364D155C0",
+   "name": "Bogotá",
+   "pick_reason": "same name, 11.4 km from the catalog point"
+  },
+  "lima": {
+   "unmapped": "no Qloo destination with this name near the city (P35-12)"
+  },
+  "medellin": {
+   "qloo_id": "13C58791-14F9-4572-9C4C-890BC019135D",
+   "name": "Medellín",
+   "pick_reason": "same name, 4.8 km from the catalog point; nearest, then higher popularity, of 2",
+   "alternative_id": "E40D5F7A-8707-434D-ABB2-2A339D82CF3C"
+  },
+  "rio-de-janeiro": {
+   "qloo_id": "B9B36D43-16C6-4FBC-8888-15576A9F5209",
+   "name": "Rio de Janeiro",
+   "pick_reason": "same name, 0.0 km from the catalog point; nearest, then higher popularity, of 2",
+   "alternative_id": "55005323-606E-4D33-A2E2-BE5E3CD6AD6A"
+  },
+  "montevideo": {
+   "qloo_id": "78A99A24-82AF-4869-B67D-4C20A1EC823E",
+   "name": "Montevideo",
+   "pick_reason": "same name, 3.6 km from the catalog point"
+  },
+  "guadalajara": {
+   "qloo_id": "BCE5238A-DCAA-441B-8412-97FA7A289EB9",
+   "name": "Guadalajara",
+   "pick_reason": "same name, 6.4 km from the catalog point"
+  },
+  "monterrey": {
+   "qloo_id": "FA9D9E25-3D37-4BED-A0DA-30BDFE2EDB4B",
+   "name": "Monterrey",
+   "pick_reason": "same name, 3.7 km from the catalog point; nearest, then higher popularity, of 2",
+   "alternative_id": "16847D8E-BF8C-4A5F-8C52-F9C6F7D2144F"
+  },
+  "dubai": {
+   "qloo_id": "82FF7A2D-BC04-437E-B2CE-333815B747F7",
+   "name": "Dubai",
+   "pick_reason": "same name, 2.6 km from the catalog point"
+  },
+  "tel-aviv": {
+   "qloo_id": "486C221E-B0C5-4AE0-9584-56AE043910DE",
+   "name": "Tel Aviv",
+   "pick_reason": "same name, 4.9 km from the catalog point"
+  },
+  "cape-town": {
+   "qloo_id": "FF34AE38-92AF-4CFB-A149-D0D85ED501C4",
+   "name": "Cape Town",
+   "pick_reason": "same name, 3.6 km from the catalog point"
+  },
+  "johannesburg": {
+   "qloo_id": "A501067E-3150-4A76-8ED6-27EBA2A01314",
+   "name": "Johannesburg",
+   "pick_reason": "same name, 4.2 km from the catalog point; nearest, then higher popularity, of 2",
+   "alternative_id": "7593E232-08E1-4871-BC18-8E41F7171FED"
+  },
+  "nairobi": {
+   "qloo_id": "8C6212BF-BF01-49D3-A879-F7BCDE5AD82D",
+   "name": "Nairobi",
+   "pick_reason": "same name, 2.6 km from the catalog point"
+  },
+  "lagos": {
+   "qloo_id": "CB861641-CE41-4587-AB34-4466B5317F69",
+   "name": "Lagos",
+   "pick_reason": "same name, 5.2 km from the catalog point"
+  },
+  "istanbul": {
+   "qloo_id": "2C222069-1960-427A-9E50-25E64D26CB44",
+   "name": "Istanbul",
+   "pick_reason": "same name, 2.0 km from the catalog point"
+  },
+  "doha": {
+   "qloo_id": "42B96B22-F2E9-492D-8EAB-7F4A4941DEF8",
+   "name": "Doha",
+   "pick_reason": "same name, 2.9 km from the catalog point; nearest, then higher popularity, of 3",
+   "alternative_id": "6B14BF02-B473-404A-A1FA-74DD81A8EC5A"
+  },
+  "riyadh": {
+   "qloo_id": "42B304BE-7993-44D1-85FA-FB2C4210E2C1",
+   "name": "Riyadh",
+   "pick_reason": "same name, 9.9 km from the catalog point"
+  },
+  "casablanca": {
+   "qloo_id": "44C61B2B-67C2-4B7E-AF43-3F680D5AF6F1",
+   "name": "Casablanca",
+   "pick_reason": "same name, 1.4 km from the catalog point"
+  },
+  "cairo": {
+   "qloo_id": "E5077442-7449-4BB8-896F-64CCBCB07553",
+   "name": "Cairo",
+   "pick_reason": "same name, 7.4 km from the catalog point"
+  },
+  "accra": {
+   "qloo_id": "31678155-D9A3-4783-A98F-8F4F511A99A4",
+   "name": "Accra",
+   "pick_reason": "same name, 5.6 km from the catalog point"
+  }
+ }
+}

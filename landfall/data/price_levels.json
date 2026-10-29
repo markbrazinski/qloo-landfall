@@ -1,0 +1,212 @@
+{
+ "source": "World Bank World Development Indicators: PA.NUS.PPP (PPP conversion factor, GDP, LCU per international $) \u00f7 PA.NUS.FCRF (official exchange rate, LCU per US$, period average), same year. This is the definition of PA.NUS.PPPC.RF (price level ratio of PPP conversion factor (GDP) to market exchange rate), which the API now lists only in the WDI archive.",
+ "source_url": [
+  "https://api.worldbank.org/v2/country/all/indicator/PA.NUS.PPP?format=json&per_page=20000&date=2018:2025",
+  "https://api.worldbank.org/v2/country/all/indicator/PA.NUS.FCRF?format=json&per_page=20000&date=2018:2025"
+ ],
+ "license": "CC BY 4.0 (World Bank Open Data)",
+ "retrieved_at": "2026-10-27",
+ "base_country": "US",
+ "values": {
+  "AE": {
+   "ratio": 0.634,
+   "year": 2024
+  },
+  "AR": {
+   "ratio": 0.457,
+   "year": 2025
+  },
+  "AT": {
+   "ratio": 0.82,
+   "year": 2025
+  },
+  "AU": {
+   "ratio": 0.901,
+   "year": 2025
+  },
+  "BE": {
+   "ratio": 0.814,
+   "year": 2025
+  },
+  "BR": {
+   "ratio": 0.457,
+   "year": 2025
+  },
+  "CA": {
+   "ratio": 0.834,
+   "year": 2025
+  },
+  "CH": {
+   "ratio": 1.12,
+   "year": 2025
+  },
+  "CL": {
+   "ratio": 0.476,
+   "year": 2025
+  },
+  "CN": {
+   "ratio": 0.473,
+   "year": 2025
+  },
+  "CO": {
+   "ratio": 0.378,
+   "year": 2025
+  },
+  "CZ": {
+   "ratio": 0.594,
+   "year": 2025
+  },
+  "DE": {
+   "ratio": 0.802,
+   "year": 2025
+  },
+  "DK": {
+   "ratio": 0.925,
+   "year": 2025
+  },
+  "EG": {
+   "ratio": 0.154,
+   "year": 2025
+  },
+  "ES": {
+   "ratio": 0.645,
+   "year": 2025
+  },
+  "FI": {
+   "ratio": 0.852,
+   "year": 2025
+  },
+  "FR": {
+   "ratio": 0.766,
+   "year": 2025
+  },
+  "GB": {
+   "ratio": 0.892,
+   "year": 2025
+  },
+  "GH": {
+   "ratio": 0.378,
+   "year": 2025
+  },
+  "HK": {
+   "ratio": 0.709,
+   "year": 2025
+  },
+  "ID": {
+   "ratio": 0.287,
+   "year": 2025
+  },
+  "IE": {
+   "ratio": 0.848,
+   "year": 2025
+  },
+  "IL": {
+   "ratio": 1.01,
+   "year": 2025
+  },
+  "IN": {
+   "ratio": 0.23,
+   "year": 2025
+  },
+  "IT": {
+   "ratio": 0.69,
+   "year": 2025
+  },
+  "JP": {
+   "ratio": 0.649,
+   "year": 2025
+  },
+  "KE": {
+   "ratio": 0.337,
+   "year": 2025
+  },
+  "KR": {
+   "ratio": 0.574,
+   "year": 2025
+  },
+  "MA": {
+   "ratio": 0.421,
+   "year": 2025
+  },
+  "MX": {
+   "ratio": 0.537,
+   "year": 2025
+  },
+  "MY": {
+   "ratio": 0.316,
+   "year": 2025
+  },
+  "NG": {
+   "ratio": 0.128,
+   "year": 2025
+  },
+  "NL": {
+   "ratio": 0.844,
+   "year": 2025
+  },
+  "NO": {
+   "ratio": 0.909,
+   "year": 2025
+  },
+  "NZ": {
+   "ratio": 0.856,
+   "year": 2025
+  },
+  "PE": {
+   "ratio": 0.515,
+   "year": 2025
+  },
+  "PH": {
+   "ratio": 0.332,
+   "year": 2025
+  },
+  "PL": {
+   "ratio": 0.524,
+   "year": 2025
+  },
+  "PT": {
+   "ratio": 0.604,
+   "year": 2025
+  },
+  "QA": {
+   "ratio": 0.563,
+   "year": 2025
+  },
+  "SA": {
+   "ratio": 0.468,
+   "year": 2025
+  },
+  "SE": {
+   "ratio": 0.87,
+   "year": 2025
+  },
+  "SG": {
+   "ratio": 0.605,
+   "year": 2025
+  },
+  "TH": {
+   "ratio": 0.307,
+   "year": 2025
+  },
+  "TR": {
+   "ratio": 0.411,
+   "year": 2025
+  },
+  "US": {
+   "ratio": 1.0,
+   "year": 2025
+  },
+  "UY": {
+   "ratio": 0.658,
+   "year": 2025
+  },
+  "VN": {
+   "ratio": 0.288,
+   "year": 2024
+  },
+  "ZA": {
+   "ratio": 0.415,
+   "year": 2025
+  }
+ }
+}

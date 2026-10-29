@@ -1,0 +1,38 @@
+# Landfall origin proxy. CloudFront terminates HTTPS and adds X-Origin-Verify; the security group admits only CloudFront.
+# ORIGIN_SECRET and STAGING_KEY come from /etc/caddy/landfall.env (SSM). Remove the staging block at the judge release.
+{
+	admin off
+	auto_https off
+}
+
+:80 {
+	header {
+		Referrer-Policy no-referrer
+		X-Robots-Tag noindex
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		-Server
+	}
+	route {
+		@stranger not header X-Origin-Verify {$ORIGIN_SECRET}
+		respond @stranger 403
+
+		# staging gate: ?staging_key=… sets a cookie once; everyone else is turned away
+		@key query staging_key={$STAGING_KEY}
+		header @key Set-Cookie "lf_staging={$STAGING_KEY}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=2592000"
+		redir @key / 303
+		@gated not header Cookie *lf_staging={$STAGING_KEY}*
+		respond @gated "Landfall is not open yet." 403
+
+		reverse_proxy 127.0.0.1:8000 {
+			flush_interval -1
+		}
+	}
+	handle_errors {
+		root * /srv/landfall/www
+		rewrite * /starting.html
+		file_server {
+			status 503
+		}
+	}
+}

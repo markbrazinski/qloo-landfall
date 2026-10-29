@@ -3,6 +3,7 @@ import json
 import sqlite3
 import threading
 import uuid
+from contextlib import contextmanager
 from datetime import datetime, timezone
 
 from . import config
@@ -26,7 +27,39 @@ CREATE TABLE IF NOT EXISTS events(project_id TEXT NOT NULL, seq INTEGER NOT NULL
   kind TEXT NOT NULL, payload TEXT NOT NULL, PRIMARY KEY(project_id, seq));
 CREATE TABLE IF NOT EXISTS usage(project_id TEXT NOT NULL, run_id TEXT, at TEXT NOT NULL, provider TEXT NOT NULL, stage TEXT,
   replayed INTEGER NOT NULL, input_tokens INTEGER, output_tokens INTEGER, est_usd REAL, status INTEGER);
+CREATE TABLE IF NOT EXISTS provider_cache(key TEXT PRIMARY KEY, provider TEXT NOT NULL, response TEXT NOT NULL,
+  fetched_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS qloo_refs(project_id TEXT NOT NULL, qloo_id TEXT NOT NULL, kind TEXT NOT NULL, name TEXT,
+  type TEXT, PRIMARY KEY(project_id, qloo_id));
+CREATE TABLE IF NOT EXISTS research_sources(id TEXT PRIMARY KEY, project_id TEXT NOT NULL, run_id TEXT, city_id TEXT,
+  tool_call_id TEXT, url TEXT NOT NULL, final_url TEXT, fetched_at TEXT, status INTEGER, title TEXT, text TEXT,
+  rendered INTEGER NOT NULL DEFAULT 0, error TEXT, contacts TEXT NOT NULL DEFAULT '[]', replayed INTEGER NOT NULL DEFAULT 0);
+CREATE INDEX IF NOT EXISTS research_sources_run ON research_sources(project_id, run_id, url);
+CREATE TABLE IF NOT EXISTS research_source_uses(source_id TEXT NOT NULL, city_id TEXT NOT NULL, run_id TEXT NOT NULL,
+  PRIMARY KEY(source_id, city_id, run_id));
+CREATE TABLE IF NOT EXISTS research_cities(project_id TEXT NOT NULL, city_id TEXT NOT NULL, version INTEGER NOT NULL,
+  status TEXT NOT NULL, run_id TEXT, input TEXT, transcript TEXT, submission TEXT, error TEXT, created_at TEXT NOT NULL,
+  started_at TEXT, ended_at TEXT, PRIMARY KEY(project_id, city_id, version));
+CREATE TABLE IF NOT EXISTS specialist_runs(project_id TEXT NOT NULL, city_id TEXT NOT NULL, method TEXT NOT NULL,
+  version INTEGER NOT NULL, status TEXT NOT NULL, run_id TEXT, input TEXT, transcript TEXT, submission TEXT, error TEXT,
+  created_at TEXT NOT NULL, started_at TEXT, ended_at TEXT, PRIMARY KEY(project_id, city_id, method, version));
+CREATE TABLE IF NOT EXISTS artifact_bytes(sha256 TEXT PRIMARY KEY, bytes BLOB NOT NULL);
+CREATE TABLE IF NOT EXISTS connection_tokens(connection_id TEXT PRIMARY KEY, token BLOB NOT NULL, at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS oauth_states(state TEXT PRIMARY KEY, project_id TEXT NOT NULL, provider TEXT NOT NULL,
+  package_id TEXT, at TEXT NOT NULL, used INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE IF NOT EXISTS approval_claims(approval_id TEXT PRIMARY KEY, action_id TEXT NOT NULL, at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS execution_slots(package_id TEXT NOT NULL, destination TEXT NOT NULL, action_id TEXT NOT NULL,
+  at TEXT NOT NULL, PRIMARY KEY(package_id, destination));
+CREATE TABLE IF NOT EXISTS recipient_claims(project_id TEXT NOT NULL, address TEXT NOT NULL, action_id TEXT NOT NULL,
+  at TEXT NOT NULL, PRIMARY KEY(project_id, address));
+CREATE TABLE IF NOT EXISTS research_steps(cr TEXT NOT NULL, key TEXT NOT NULL, kind TEXT NOT NULL, status TEXT NOT NULL,
+  result TEXT, usd REAL NOT NULL DEFAULT 0, at TEXT NOT NULL, PRIMARY KEY(cr, key));
+CREATE TABLE IF NOT EXISTS grants(hash TEXT PRIMARY KEY, kind TEXT NOT NULL, label TEXT NOT NULL, created_at TEXT NOT NULL,
+  revoked_at TEXT);
+CREATE TABLE IF NOT EXISTS grant_sessions(session TEXT PRIMARY KEY, grant_hash TEXT NOT NULL, at TEXT NOT NULL);
 """
+# Columns added after slice 1 (an existing database keeps its rows). ponytail: no migration tool until a second one.
+MIGRATIONS = ["ALTER TABLE usage ADD COLUMN origin TEXT", "ALTER TABLE usage ADD COLUMN attempt INTEGER"]
 
 _lock = threading.RLock()
 _conn: sqlite3.Connection | None = None
@@ -48,6 +81,11 @@ def conn() -> sqlite3.Connection:
         _conn.row_factory = sqlite3.Row
         _conn.execute("PRAGMA journal_mode=WAL")
         _conn.executescript(SCHEMA)
+        for m in MIGRATIONS:
+            try:
+                _conn.execute(m)
+            except sqlite3.OperationalError:
+                pass  # already applied
     return _conn
 
 
@@ -68,6 +106,24 @@ def q(sql: str, *args) -> list[sqlite3.Row]:
 def x(sql: str, *args) -> int:
     with _lock:
         return conn().execute(sql, args).rowcount
+
+
+@contextmanager
+def tx():
+    """One BEGIN IMMEDIATE transaction (the recipient-claim pattern): a check and its writes can't interleave across
+    threads or processes, and records written together land together or not at all. A nested call joins the outer one."""
+    with _lock:
+        c = conn()
+        if c.in_transaction:
+            yield
+            return
+        c.execute("BEGIN IMMEDIATE")
+        try:
+            yield
+        except BaseException:
+            c.execute("ROLLBACK")
+            raise
+        c.execute("COMMIT")
 
 
 # ---- records (immutable versions) ----

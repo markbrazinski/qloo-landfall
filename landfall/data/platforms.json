@@ -1,0 +1,103 @@
+{
+ "version": "platforms@2",
+ "checked_at": "2026-10-26",
+ "note": "Option types only, quoted verbatim from official pages read through Landfall's fetcher; not specific interest names, sizes or costs.",
+ "entries": [
+  {
+   "id": "google.affinity",
+   "platform": "Google",
+   "option_type": "Affinity segments",
+   "url": "https://support.google.com/google-ads/answer/2497941?hl=en",
+   "quote": "- Affinity segments: Reach users based on what they're passionate about and their habits and interests.",
+   "checked_at": "2026-10-26",
+   "page_sha256": "2570e31e1c498503c46c979540e11abbceb746e6c04bf6f4fd90e104b5db979d",
+   "checked_by": "FETCHED"
+  },
+  {
+   "id": "google.in_market",
+   "platform": "Google",
+   "option_type": "In-market segments",
+   "url": "https://support.google.com/google-ads/answer/2497941?hl=en",
+   "quote": "In-market segments are designed for advertisers focused on getting conversions from likely buyers.",
+   "checked_at": "2026-10-26",
+   "page_sha256": "2570e31e1c498503c46c979540e11abbceb746e6c04bf6f4fd90e104b5db979d",
+   "checked_by": "FETCHED"
+  },
+  {
+   "id": "tiktok.interests",
+   "platform": "TikTok",
+   "option_type": "Interest targeting",
+   "url": "https://ads.tiktok.com/help/article/interest-targeting?lang=en",
+   "quote": "Interest Targeting is a way of finding people based on their long-term interests and interaction with content on TikTok.",
+   "checked_at": "2026-10-26",
+   "page_sha256": "2e10d29181faff550ddb996a12e5c6a228f36b184eb03e8b05b9e93aa7f69314",
+   "checked_by": "FETCHED"
+  },
+  {
+   "id": "tiktok.location",
+   "platform": "TikTok",
+   "option_type": "Location targeting",
+   "url": "https://ads.tiktok.com/help/article/location-targeting?lang=en",
+   "quote": "TikTok Ads allow you to tailor messages and offers to specific locations including countries, regions, states, provinces, metro areas, cities, zip codes and more.",
+   "checked_at": "2026-10-26",
+   "page_sha256": "962c2e58fb411c09cbce170691e555ded25e7d9f324493d880454160edb9caa7",
+   "checked_by": "FETCHED"
+  },
+  {
+   "id": "google.location_radius",
+   "platform": "Google",
+   "option_type": "Location targeting with a radius",
+   "url": "https://support.google.com/google-ads/answer/1722038?hl=en",
+   "quote": "- Access to a variety of targeting locations, ranging from entire countries, areas within a country like cities or territories, or a radius around a location.",
+   "checked_at": "2026-10-26",
+   "page_sha256": "e7e392bdc84663472a7632b6d8c32a928e913980f5cab7ff586d616aae0644c1",
+   "checked_by": "FETCHED"
+  },
+  {
+   "id": "google.demographics",
+   "platform": "Google",
+   "option_type": "Demographic targeting (age, gender)",
+   "url": "https://support.google.com/google-ads/answer/2580383?hl=en",
+   "quote": "With demographic targeting in Google Ads, you can reach a specific set of potential customers who are likely to be within a particular age range, gender, parental status, or household income.",
+   "checked_at": "2026-10-26",
+   "checked_by": "FETCHED",
+   "page_sha256": "c8ebb130a04c8b08961403e2269ac75f4a9fa07485d12126f7525cfab81a49d0"
+  },
+  {
+   "id": "meta.city_radius",
+   "platform": "Meta",
+   "option_type": "City targeting with a radius",
+   "url": "https://developers.facebook.com/docs/marketing-api/audiences/reference/basic-targeting",
+   "quote": "`radius` is a distance around cities, from 10 to 50 miles or 17 to 80 kilometers.",
+   "checked_at": "2026-10-26",
+   "checked_by": "BUILDER_CHECKED"
+  },
+  {
+   "id": "meta.interests",
+   "platform": "Meta",
+   "option_type": "Detailed targeting interests (validate by id)",
+   "url": "https://developers.facebook.com/docs/marketing-api/audiences/reference/targeting-search",
+   "quote": "Interests may be renamed at any time, and validating by name may fail when this happens.",
+   "checked_at": "2026-10-26",
+   "checked_by": "BUILDER_CHECKED"
+  },
+  {
+   "id": "meta.age",
+   "platform": "Meta",
+   "option_type": "Age range",
+   "url": "https://developers.facebook.com/docs/marketing-api/audiences/reference/basic-targeting",
+   "quote": "Minimum age. Defaults to 18. If used, must be 13 or higher. Maximum age. If used, must be 65 or lower.",
+   "checked_at": "2026-10-26",
+   "checked_by": "BUILDER_CHECKED"
+  },
+  {
+   "id": "meta.gender",
+   "platform": "Meta",
+   "option_type": "Gender",
+   "url": "https://developers.facebook.com/docs/marketing-api/audiences/reference/basic-targeting",
+   "quote": "Genders to target. Defaults to all. `1` targets males, `2` targets females.",
+   "checked_at": "2026-10-26",
+   "checked_by": "BUILDER_CHECKED"
+  }
+ ]
+}

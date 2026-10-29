@@ -52,3 +52,6 @@ web/node_modules/
 *.db-shm
 *.lock.lck
 live-captures-private/usage-ledger.lock
+
+# Recorded demo cases (owner, 28 Oct 2026): kept locally, not in git until a curated set is chosen at the end
+fixtures/demo/

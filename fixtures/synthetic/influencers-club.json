@@ -1,0 +1,176 @@
+{
+ "_note": "SYNTHETIC Influencers.club discovery response for demo projects and tests. Not real creators.",
+ "total": 12,
+ "limit": 10,
+ "credits_left": "SYNTHETIC",
+ "accounts": [
+  {
+   "user_id": "syn-001",
+   "profile": {
+    "full_name": "SYNTHETIC Riverbank Rambles",
+    "username": "synthetic_riverbank",
+    "followers": 12000,
+    "engagement_percent": 2.1
+   },
+   "matched_filters": {
+    "audience_location": [
+     "SYNTHETIC city>24%"
+    ]
+   }
+  },
+  {
+   "user_id": "syn-002",
+   "profile": {
+    "full_name": "SYNTHETIC Trail & Tote",
+    "username": "synthetic_trailtote",
+    "followers": 15100,
+    "engagement_percent": 2.27
+   },
+   "matched_filters": {
+    "audience_location": [
+     "SYNTHETIC city>25%"
+    ]
+   }
+  },
+  {
+   "user_id": "syn-003",
+   "profile": {
+    "full_name": "SYNTHETIC Coastline Carry",
+    "username": "synthetic_coastline",
+    "followers": 18200,
+    "engagement_percent": 2.44
+   },
+   "matched_filters": {
+    "audience_location": [
+     "SYNTHETIC city>26%"
+    ]
+   }
+  },
+  {
+   "user_id": "syn-004",
+   "profile": {
+    "full_name": "SYNTHETIC Weekend Packs",
+    "username": "synthetic_weekendpacks",
+    "followers": 21300,
+    "engagement_percent": 2.61
+   },
+   "matched_filters": {
+    "audience_location": [
+     "SYNTHETIC city>27%"
+    ]
+   }
+  },
+  {
+   "user_id": "syn-005",
+   "profile": {
+    "full_name": "SYNTHETIC City Commuter",
+    "username": "synthetic_citycommuter",
+    "followers": 24400,
+    "engagement_percent": 2.78
+   },
+   "matched_filters": {
+    "audience_location": [
+     "SYNTHETIC city>28%"
+    ]
+   }
+  },
+  {
+   "user_id": "syn-006",
+   "profile": {
+    "full_name": "SYNTHETIC Recycled Roads",
+    "username": "synthetic_recycledroads",
+    "followers": 27500,
+    "engagement_percent": 2.95
+   },
+   "matched_filters": {
+    "audience_location": [
+     "SYNTHETIC city>29%"
+    ]
+   }
+  },
+  {
+   "user_id": "syn-007",
+   "profile": {
+    "full_name": "SYNTHETIC Gear Notes",
+    "username": "synthetic_gearnotes",
+    "followers": 30600,
+    "engagement_percent": 3.12
+   },
+   "matched_filters": {
+    "audience_location": [
+     "SYNTHETIC city>30%"
+    ]
+   }
+  },
+  {
+   "user_id": "syn-008",
+   "profile": {
+    "full_name": "SYNTHETIC Ocean Loop",
+    "username": "synthetic_oceanloop",
+    "followers": 33700,
+    "engagement_percent": 3.29
+   },
+   "matched_filters": {
+    "audience_location": [
+     "SYNTHETIC city>31%"
+    ]
+   }
+  },
+  {
+   "user_id": "syn-009",
+   "profile": {
+    "full_name": "SYNTHETIC Daypack Diaries",
+    "username": "synthetic_daypack",
+    "followers": 36800,
+    "engagement_percent": 3.46
+   },
+   "matched_filters": {
+    "audience_location": [
+     "SYNTHETIC city>32%"
+    ]
+   }
+  },
+  {
+   "user_id": "syn-010",
+   "profile": {
+    "full_name": "SYNTHETIC Bayside Walks",
+    "username": "synthetic_bayside",
+    "followers": 39900,
+    "engagement_percent": 3.63
+   },
+   "matched_filters": {
+    "audience_location": [
+     "SYNTHETIC city>33%"
+    ]
+   }
+  },
+  {
+   "user_id": "syn-011",
+   "profile": {
+    "full_name": "SYNTHETIC Hill Hikers",
+    "username": "synthetic_hillhikers",
+    "followers": 43000,
+    "engagement_percent": 3.8
+   },
+   "matched_filters": {
+    "audience_location": [
+     "SYNTHETIC city>34%"
+    ]
+   }
+  },
+  {
+   "user_id": "syn-012",
+   "profile": {
+    "full_name": "SYNTHETIC Market Mornings",
+    "username": "synthetic_marketmornings",
+    "followers": 46100,
+    "engagement_percent": 3.97
+   },
+   "matched_filters": {
+    "audience_location": [
+     "SYNTHETIC city>35%"
+    ]
+   }
+  }
+ ]
+}

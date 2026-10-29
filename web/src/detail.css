@@ -1,0 +1,15 @@
+/* Method detail (v4 09, B05–B08): street map behind the proximity dots, and the questions list. */
+.dt-map { position: relative; width: 100%; overflow: hidden; border-radius: 6px; background: var(--lf-fog); border: 1px solid var(--lf-rule); }
+.dt-map img { position: absolute; max-width: none; user-select: none; }
+.dt-map svg { position: absolute; inset: 0; pointer-events: none; }
+.dt-dot { fill: var(--lf-graphite); stroke: #fff; stroke-width: 2; }
+.dt-center { fill: #fff; stroke: var(--lf-marigold-deep); stroke-width: 2; }
+.dt-label { font: 500 12px var(--lf-font-sans); fill: var(--lf-graphite); paint-order: stroke; stroke: #fff; stroke-width: 3.5px; stroke-linejoin: round; }
+.dt-bar { stroke: var(--lf-graphite); stroke-width: 2; }
+.dt-attr { position: absolute; right: 0; bottom: 0; font-size: 11px; line-height: 16px; padding: 1px 6px; background: rgb(255 255 255 / 0.85); color: var(--lf-graphite); }
+
+.dt-asks { margin: 0; padding: 4px 14px 4px 36px; font-size: 13px; }
+.dt-asks li { padding: 6px 0; }
+.dt-asks li > span { margin-right: 8px; }
+.md-list > .dt-asks:not(:first-child) { border-top: 1px solid var(--lf-fog); }
+.dt-gaps { margin: 4px 0 0; padding-left: 18px; }

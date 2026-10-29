@@ -1,0 +1,22 @@
+{
+ "version": "methods@1",
+ "source": "Qloo place genre ids, each present in a recorded Qloo response (P4-1 and the slice-3/3.5 captures, 25 Oct 2026); the retail set is chosen by brand_genres@1",
+ "methods": {
+  "retail": "Retail · a shop that stocks outside brands",
+  "creator": "Creator · a local creator with a readable page",
+  "popup": "Pop-up · a venue that hosts events or rents space",
+  "community": "Community · a group or activity that meets in the city",
+  "digital": "Digital · reaching the city's audience online"
+ },
+ "retail": {
+  "urn:tag:genre:brand:fashion": ["clothing_store", "mens_clothing_store", "boutique", "fashion_accessories_store", "shoe_store"],
+  "urn:tag:genre:brand:fashion:accessories": ["fashion_accessories_store", "jewelry_store", "sunglasses_store", "gift_shop", "boutique"],
+  "urn:tag:genre:brand:food_and_beverage:drinks": ["grocery_store", "gourmet_grocery_store", "health_food_store", "tea_store", "wine_store"],
+  "urn:tag:genre:brand:food_and_beverage:food": ["grocery_store", "gourmet_grocery_store", "health_food_store", "farmers_market"],
+  "urn:tag:genre:brand:health_and_beauty": ["beauty_supply_store", "cosmetics_store", "perfume_store", "boutique"],
+  "urn:tag:genre:brand:fashion:home_accessories": ["home_goods_store", "furniture_store", "gift_shop", "boutique"],
+  "unknown": ["clothing_store", "gift_shop", "boutique", "department_store", "home_goods_store"]
+ },
+ "popup": ["event_venue", "art_gallery", "shopping_mall", "flea_market"],
+ "community": ["gym", "park", "club"]
+}

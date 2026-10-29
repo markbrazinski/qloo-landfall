@@ -1,1 +1,1 @@
-{"root":["./src/brand.tsx","./src/entry.tsx","./src/api.ts","./src/main.tsx","./src/ui.tsx"],"version":"5.9.3"}
+{"root":["./src/act.tsx","./src/actadapt.tsx","./src/brand.tsx","./src/deliver.tsx","./src/discovery.tsx","./src/entry.tsx","./src/goal.tsx","./src/investigation.tsx","./src/markets.tsx","./src/opportunities.tsx","./src/plan.tsx","./src/planmoney.tsx","./src/worldmap.tsx","./src/api.ts","./src/main.tsx","./src/pace.ts","./src/ui.tsx","./src/vite-env.d.ts","./src/mockups/campaignmockup.tsx"],"version":"5.9.3"}

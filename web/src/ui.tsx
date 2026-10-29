@@ -1,17 +1,25 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
-// ---- LF-StatusChip: knowledge state as text first, colour second (COMPONENT-CATALOG §9) ----
+// ---- LF-StatusChip: knowledge state as text first, color second (COMPONENT-CATALOG §9) ----
 const CATEGORY: Record<string, string[]> = {
-  sourced: ["SOURCE", "SUPPORTED", "STATED", "LISTED RATE", "PRESENCE VERIFIED", "DONE", "YOUR SITE"],
-  founder: ["YOU SAID", "ADDED BY YOU", "NEEDS YOU", "CHECKED BY YOU", "DEFAULT", "DESCRIPTION"],
-  qloo: ["QLOO", "QLOO · CATEGORY", "CANDIDATE", "RETURNED"],
-  interpretation: ["TEAM READ", "INFERRED", "ESTIMATE", "ASSUMED", "DRAFT", "CALC"],
-  unknown: ["UNKNOWN", "NOT KNOWN", "TO CHECK", "NOT CHECKED", "NOT READ", "BASIS NOT ESTABLISHED"],
-  contested: ["SOURCES DIFFER", "AMBIGUOUS", "UNCONFIRMED", "REVIEW · FACT CHANGED"],
-  failed: ["FAILED", "CHECK FAILED", "UNAVAILABLE", "SITE UNREADABLE"],
-  running: ["RUNNING", "CHECKING", "READING"],
-  idle: ["QUEUED", "SKIPPED", "SUPERSEDED", "STOPPED"],
-  proposal: ["DEMONSTRATION", "RECORDED", "SYNTHETIC"],
+  sourced: ["FOUND NOW", "SENT", "CREATED · PAUSED", "ACCOUNT", "EVIDENCED", "DEVELOPED", "BRAND FACT MATCH", "VERIFIED", "LOCAL", "OWN SITE", "PUBLIC FORM", "PLACED", "KEPT", "HIRE OFFERED", "HOSTED EVENT", "MARKET LISTING", "UPCOMING", "RECURRING", "IDENTIFIED", "REPORTED", "SELF REPORTED", "PLATFORM OPTION", "SOURCED", "MATCH", "EVIDENCED DRAFT", "PUBLISHED FORM", "EMAIL", "SOURCE", "SUPPORTED", "STATED", "LISTED RATE", "PRESENCE VERIFIED", "DONE", "YOUR SITE",
+    "NAME MATCHES YOUR SITE", "WEBSITE MATCHES", "LINKED FROM YOUR SITE", "ON YOUR HOMEPAGE", "SAME COUNTRY", "INSIDE YOUR RANGE", "NO IMPORT STEP (EU)",
+    "SAME TRADE BLOC", "SHARED LANGUAGE", "HOME", "HOME COUNTRY"],
+  founder: ["YOUR BEACHHEAD", "SELECTED BY YOU", "APPROVED", "READY TO APPROVE", "MARKED SENT BY YOU", "MARKED CREATED BY YOU", "FOUNDER", "YOU CHOSE", "DRAFTED", "FOUNDER EXCLUDED", "YOU SAID", "ADDED BY YOU", "NEEDS YOU", "CHECKED BY YOU", "DEFAULT", "DESCRIPTION", "CONFIRMED", "YOU CHANGED",
+    "YOU LEFT THIS OUT", "YOU'RE ALREADY HERE", "MOVED FOR YOUR GOAL"],
+  qloo: ["QLOO RELATED", "QLOO LISTING", "QLOO DERIVED", "QLOO SEARCH", "PLATFORM DECLARED", "QLOO", "QLOO · CATEGORY", "COMPARABLE · NOT YOU", "CANDIDATE", "RETURNED", "QLOO STORES", "QLOO KEY MARKET"],
+  interpretation: ["DERIVED", "HYPOTHESIS-LED", "HYPOTHESIS-LED DRAFT", "INTERPRETATION", "REPEATED BEFORE", "PARTIAL", "HYPOTHESIS", "PROPOSAL", "SCALE MISMATCH", "TEAM READ", "DETERMINISTIC", "MIXED", "INFERRED", "ESTIMATE", "ASSUMED", "DRAFT", "CALC", "MODERATE · NOT YET CHECKED",
+    "LIMITED · NOT YET CHECKED"],
+  unknown: ["NEEDS INFORMATION", "CONNECT", "VERIFICATION PENDING", "RIGHTS TO CHECK", "NOT YET", "NEEDS RESEARCH", "PENDING", "UNPLACED", "UNDATED", "POSSIBLE", "WILLINGNESS UNKNOWN", "TO CHECK IN ADS MANAGER", "NONE", "UNKNOWN", "NOT KNOWN", "TO CHECK", "NOT CHECKED", "NOT READ", "BASIS NOT ESTABLISHED", "NOT CONFIRMED",
+    "UNRESOLVED", "COULDN'T RESOLVE", "THIN SEARCH RESULT", "FIT NOT KNOWN", "IMPORT NEEDED", "COULD CHANGE IT",
+    "EXPLORE BY ANOTHER ROUTE", "INSUFFICIENT EVIDENCE", "NOT RANKED BY QLOO", "IMPORT, NEW LANGUAGE"],
+  contested: ["EARLIER PLAN", "SET ASIDE", "USED", "UNCERTAIN", "OUTDATED", "NOT CONFIRMED PAUSED", "SOURCES DIFFER", "AMBIGUOUS", "UNCONFIRMED", "REVIEW · FACT CHANGED", "DIFFERENT WEBSITE"],
+  failed: ["NOT CONNECTED", "FAILED", "CHECK FAILED", "UNAVAILABLE", "SITE UNREADABLE", "DROPPED BY CHECKS"],
+  running: ["RUNNING", "CHECKING", "READING", "SEARCHING"],
+  idle: ["UNAVAILABLE HERE", "PLATFORM APPROVAL REQUIRED", "FIXED", "REJECTED", "PAST", "ONE OFF", "CHAIN", "ORGANISER", "VENUE", "BOTH", "CATEGORY MISMATCH", "NOT RUN", "QUEUED", "SKIPPED", "SUPERSEDED", "STOPPED", "NO MATCH", "EMPTY", "STRONG ALTERNATIVE", "ALSO WORTH RESEARCHING",
+    "NOT PRIORITISED", "NOT PROPOSED", "OUTSIDE YOUR GOAL"],
+  proposal: ["DEMONSTRATION", "RECORDED", "SYNTHETIC", "PROPOSED", "RESEARCH PRIORITY", "INVESTIGATE FIRST", "TOP RECOMMENDATION",
+    "RECOMMENDED"],
 };
 const categoryOf = (label: string) =>
   Object.entries(CATEGORY).find(([, ls]) => ls.includes(label.toUpperCase()))?.[0] ?? "idle";
@@ -46,9 +54,20 @@ export function Lockup() {
   );
 }
 
+// ---- a tiny router: pushState plus a popstate the app listens to ----
+export function navigate(to: string) {
+  window.history.pushState({}, "", to);
+  window.dispatchEvent(new PopStateEvent("popstate"));
+  window.scrollTo(0, 0);
+}
+
+export function Link({ to, className, children }: { to: string; className?: string; children: ReactNode }) {
+  return <a href={to} className={className} onClick={(e) => { e.preventDefault(); navigate(to); }}>{children}</a>;
+}
+
 // ---- LF-AppShell / LF-ProjectHeader / LF-StageNav ----
-export type Stage = { label: string; outcome: string };
-const STAGES = ["Brand", "Markets", "Opportunities", "Decide", "Pursue"];
+/** One of the four v4 stages. `locked` says why it can't be opened yet (SH1). */
+export type Stage = { label: string; outcome: string; href?: string; locked?: string };
 
 export function ProjectHeader(props: {
   brand: string; site: string; intent: string; briefVersion?: number; running: boolean; usage: string; demo: boolean;
@@ -63,44 +82,42 @@ export function ProjectHeader(props: {
           <div className="ph-brand">
             {props.brand} {props.demo && <Chip label="DEMONSTRATION" title="Recorded provider responses replayed; no live calls" />}
           </div>
-          <div className="mono steel">{props.site} · {props.intent}</div>
         </div>
       </div>
       <div className="ph-actions">
-        {props.briefVersion && (
-          <button type="button" className="btn-secondary" onClick={props.onBrief}>
-            Brief <span className="mono steel">v{props.briefVersion}</span>
-          </button>
-        )}
         <button type="button" className="btn-secondary" onClick={props.onActivity}>
-          <span className={`dot ${props.running ? "dot-running" : ""}`} aria-hidden /> Activity{" "}
-          <span className="mono steel">{props.usage}</span>
+          <span className={`dot ${props.running ? "dot-running" : ""}`} aria-hidden /> Activity
         </button>
       </div>
     </header>
   );
 }
 
-export function StageNav({ brandOutcome }: { brandOutcome: string }) {
-  const [open, setOpen] = useState(false);
-  const items = STAGES.map((s, i) => ({ s, i, outcome: i === 0 ? brandOutcome : "Not started" }));
+/** Brand · Markets · Plan · Act. A locked stage explains itself when clicked; `current` -1 marks a page outside the four. */
+export function StageNav({ stages, current }: { stages: Stage[]; current: number }) {
+  const [why, setWhy] = useState<string | null>(null);
   return (
     <nav className="stage-nav" aria-label="Stages">
-      <button type="button" className="stage-compact" aria-expanded={open} onClick={() => setOpen(!open)}>
-        1 / 5 · Brand <span className="steel">{brandOutcome}</span> ▾
-      </button>
-      <ol className={open ? "open" : ""}>
-        {items.map(({ s, i, outcome }) => (
-          <li key={s} className={i === 0 ? "current" : "disabled"} aria-current={i === 0 ? "step" : undefined}
-              title={i === 0 ? undefined : "Arrives in a later build"}>
-            <span className="stage-num">{i + 1}</span>
-            <span className="stage-text">
-              <span className="stage-label">{s}</span>
-              <span className="stage-outcome">{outcome}</span>
-            </span>
-          </li>
-        ))}
+      <ol>
+        {stages.map((st, i) => {
+          const body = (
+            <>
+              <span className="stage-num">{i < current && st.href ? "✓" : i + 1}</span>
+              <span className="stage-text">
+                <span className="stage-label">{st.label}</span>
+                <span className="stage-outcome">{st.outcome}</span>
+              </span>
+            </>
+          );
+          return (
+            <li key={st.label} className={i === current ? "current" : st.href ? "done" : "disabled"} aria-current={i === current ? "step" : undefined}>
+              {i === current ? body : st.href ? <Link to={st.href} className="stage-link">{body}</Link>
+                : <button type="button" className="stage-link stage-locked" onClick={() => setWhy(st.locked || "Not available yet")}>{body}</button>}
+            </li>
+          );
+        })}
       </ol>
+      {why && <p className="stage-why" role="status">{why} <button type="button" className="link" onClick={() => setWhy(null)}>Dismiss</button></p>}
     </nav>
   );
 }
@@ -155,13 +172,29 @@ export function useDrawers() {
   return { stack, push, pop, close };
 }
 
+/** Tab and Shift+Tab cycle inside `box` (drawers and dialogs). */
+export function trapTab(e: KeyboardEvent, box: HTMLElement | null) {
+  if (e.key !== "Tab" || !box) return;
+  const f = [...box.querySelectorAll<HTMLElement>("a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex='-1'])")]
+    .filter((el) => el.getClientRects().length > 0);  // hidden controls (the 390 px <select>) can't take focus
+  if (!f.length) return;
+  const [first, last] = [f[0], f[f.length - 1]];
+  // focus that fell out (its control unmounted, e.g. a chip row that closed on choice) comes back in, never to the page
+  if (!box.contains(document.activeElement)) { e.preventDefault(); (e.shiftKey ? last : first).focus(); return; }
+  if (e.shiftKey && (document.activeElement === first || document.activeElement === box)) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+}
+
 export function DrawerStack({ d }: { d: ReturnType<typeof useDrawers> }) {
   const panel = useRef<HTMLDivElement>(null);
   const top = d.stack[d.stack.length - 1];
   useEffect(() => {
     if (!top) return;
     panel.current?.focus();
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && d.pop();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") d.pop();
+      trapTab(e, panel.current);  // SH4: focus stays inside the open drawer
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [top?.entry.key]); // eslint-disable-line react-hooks/exhaustive-deps
