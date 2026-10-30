@@ -105,7 +105,7 @@ export function historyOf(pkgs: Package[]) {
   const rows: Row[] = pkgs.filter((v) => v.version).flatMap((v) => v.destination_states.map((d) => ({ v, d })));
   return rows.flatMap((r) => {
     const name = r.v.flow === "outreach" ? `Inquiry to ${partnerOf(r.v)}` : `Google Ads · ${r.d.label}`;
-    return [...r.d.actions.filter((x) => x.status !== "REFUSED").map((x) => ({ at: x.at, t: `${name} · ${histWord(r.d, x.status, partnerOf(r.v))}` })),
+    return [...r.d.actions.filter((x) => x.status !== "REFUSED").map((x) => ({ at: x.at, t: `${name} · ${x.mode === "SIMULATED" ? `simulated · nothing was ${r.d.destination === "EMAIL" ? "sent" : "created"}` : histWord(r.d, x.status, partnerOf(r.v))}` })),
       ...r.d.manual_records.map((m) => ({ at: m.date, t: `${name} · ${r.d.destination === "EMAIL" ? (m.note ? `${m.note.toLowerCase()} · recorded by you` : "marked sent by you") : "set up by you"}${(m as { withdrawn_at?: string }).withdrawn_at ? " (undone)" : ""}` }))];
   }).sort((x, y) => (x.at < y.at ? 1 : -1));
 }

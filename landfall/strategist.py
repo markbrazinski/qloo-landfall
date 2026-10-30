@@ -229,6 +229,23 @@ def with_search_ads(sub: dict, pid: str, cid: str) -> dict:
     return sub
 
 
+SAMPLE_SHAPE = ("\n\nThe founder has chosen the plan's shape: a creator collaboration (method creator) as the MAIN test and "
+                "Google Search ads (method digital) as SUPPORTS, and no other method. Every option has exactly those two.")
+
+
+def sample_shape(sub: dict, pid: str) -> dict:
+    """Owner, 29 Oct 2026: a real brand's recorded demo is a creator (sample creators) with Google Ads beside it. The
+    prompt says so (SAMPLE_SHAPE); this keeps any option that strays to exactly those two, with the model's reasons."""
+    from . import influencers
+    if not influencers.sample(pid):
+        return sub
+    for o in sub.get("options") or []:
+        why = {m.get("method"): m.get("reason") for m in o.get("methods") or []}
+        o["methods"] = [{"method": "creator", "role": "MAIN", "reason": why.get("creator") or "A local creator introduces the brand."},
+                        {"method": "digital", "role": "SUPPORTS", "reason": why.get("digital") or "Google Search ads run alongside every plan."}]
+    return sub
+
+
 def validate(sub: dict, cid: str, ev: list[dict], faults: list) -> dict:
     """Deterministic: what survives is shown; what fails is dropped with a fault, never rewritten."""
     ids = {e["id"] for e in ev}
@@ -488,18 +505,19 @@ def propose_run(run: Run):
                        stage="launch_strategist", cr_key=f"{pid}:{cid}:{pv}:propose:{run.id}")
     ev = run.step("evidence", lambda: evidence(pid, cid))
     ceiling = plans.ceiling_of(db.latest("founder_input", pid))
-    text = prompt(pid, cid, plan, ev, ceiling)
+    from . import influencers
+    text = prompt(pid, cid, plan, ev, ceiling) + (SAMPLE_SHAPE if influencers.sample(pid) else "")
     research._activity(run, f"Propose a plan for {markets.CITIES[cid]['name']}", "launch strategist", "one structured call",
                        status="RUNNING", role="Strategist")
     faults: list = []
-    sub = with_search_ads(run.step("propose", lambda: call(ctx, text)), pid, cid)
+    sub = sample_shape(with_search_ads(run.step("propose", lambda: call(ctx, text)), pid, cid), pid)
     if sub.get("error"):
         faults.append({"field": "options", "reason": f"the answer couldn't be read ({sub['error']})"})
     got = validate(sub, cid, ev, faults)
     if not got["options"]:  # the one repair: what failed, then FAILED with Retry and no plan change
         sub = run.step("repair", lambda: call(ctx, text + "\n\nYour previous answer couldn't be used: " +
                                               "; ".join(f["reason"] for f in faults[-6:]) + ". Return ProposalIn again."))
-        got = validate(with_search_ads(sub, pid, cid), cid, ev, faults)
+        got = validate(sample_shape(with_search_ads(sub, pid, cid), pid), cid, ev, faults)
     if not got["options"]:
         return "failed", "The strategist's answer couldn't be used, so nothing in your plan changed. Retry, or keep your roles."
     ccy = markets.CURRENCY.get(markets.CITIES[cid]["country"]) or "USD"  # the estimates' currency too

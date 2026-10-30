@@ -45,7 +45,7 @@ def test_link_gives_a_fresh_session_and_a_clean_url(client, env):
     assert sid != "planted-by-someone-else" and grants.kind_of("planted-by-someone-else") is None
     assert grants.kind_of(sid) == "judge"
     client.cookies.set("lf_session", sid)
-    assert client.get("/api/session").json() == {"track": "live", "grant_kind": "judge"}
+    assert client.get("/api/session").json().items() >= {"track": "live", "grant_kind": "judge"}.items()
 
 
 def test_unknown_and_revoked_ids_redirect_without_a_grant(client, env):
@@ -63,7 +63,7 @@ def test_revocation_applies_on_the_next_request(client, env):
     client.cookies.set("lf_session", _open(client, raw).cookies["lf_session"])
     assert client.get("/api/session").json()["track"] == "live"
     grants.revoke(hashlib.sha256(raw.encode()).hexdigest())  # by hash as well as by label
-    assert client.get("/api/session").json() == {"track": "demo", "grant_kind": None}
+    assert client.get("/api/session").json().items() >= {"track": "demo", "grant_kind": None}.items()
 
 
 def test_access_form_accepts_a_pasted_id_or_the_whole_link(client, env):
@@ -83,7 +83,7 @@ def test_https_uses_the_host_prefixed_secure_cookie(client, env):
 
 def test_without_a_grant_every_project_is_the_recorded_demo(client, env, no_live_runs):
     env("LANDFALL_REQUIRE_GRANT", "on")
-    assert client.get("/api/session").json() == {"track": "demo", "grant_kind": None}
+    assert client.get("/api/session").json().items() >= {"track": "demo", "grant_kind": None}.items()
     r = client.post("/api/projects", json={"url": "https://brand.example"}).json()
     assert r["track"] == "demo"
     p = db.q("SELECT * FROM projects WHERE id=?", r["project_id"])[0]

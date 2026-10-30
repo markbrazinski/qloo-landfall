@@ -6,7 +6,9 @@
       its background preparation (messages, ads, launch kit), picks the first ad and opens "See exactly what's sent"
       once. With --demo it starts from the demo intake instead, checks the recording's choices (fixtures/demo/<brand>/
       case.json) and then presses every sign-off, which a demo runs SIMULATED. Writes walk.json and screenshots to <out_dir>; --from resumes a walk at a step (entry, brief, markets,
-      plan, launch). Never searches Influencers.club, connects Gmail or Google Ads, or presses Send / Create / Copy.
+      plan, launch). The plan is a creator with Google Ads (strategist.sample_shape) and its creators are samples
+      (influencers.sample): a recording picks each so any pick replays. Never searches Influencers.club, connects Gmail
+      or Google Ads, or presses Send / Create / Copy.
   package <brand> <out_dir>
       With LANDFALL_DB pointing at the recording database: the walk's recorded exchanges, minus every Influencers.club
       exchange, into fixtures/demo/<brand>/ with a case.json. Refuses secrets.
@@ -16,7 +18,7 @@
 
 Recording (live, under the active authority; ≈ US$1–1.5 Bedrock per brand; one brand at a time):
   cp .landfall/l67.db .landfall/rec2.db (+ -wal, -shm)
-  LANDFALL_DB=.landfall/rec2.db LANDFALL_PROVIDER_MODE=record LANDFALL_AUTO_PLAN=1 LANDFALL_SHARED_DELIVERY= \
+  LANDFALL_DB=.landfall/rec2.db LANDFALL_PROVIDER_MODE=record LANDFALL_AUTO_PLAN=1 LANDFALL_SAMPLE_CREATORS=on LANDFALL_SHARED_DELIVERY= \
     LANDFALL_REQUIRE_GRANT= LANDFALL_REPLAY_CASES= LANDFALL_LIVE_STAGES= SHOPIFY_AGENT_PROFILE_URL= \
     influencers_club_api_key= influencer_api_key= uv run uvicorn landfall.app:app --host 127.0.0.1 --port 8114
   (cd web && LANDFALL_API=http://127.0.0.1:8114 npx vite --host 127.0.0.1 --port 5186 --strictPort)
@@ -92,11 +94,12 @@ def walk(base: str, brand: str, out: Path, demo: bool, start: str = "entry") -> 
                 expect(bar.filter(has_text="Explore markets")).to_be_visible(timeout=600000)
                 bar.filter(has_text="Explore markets").click()
             page.wait_for_url(re.compile(r"/markets"), timeout=600000)
-            see = page.get_by_role("button", name="See recommended markets")
-            see.wait_for(timeout=1800000)
+            see, build = page.get_by_role("button", name="See recommended markets"), bar.filter(has_text="Build a plan for")
+            expect(see.or_(build)).to_be_visible(timeout=1800000)  # the page may move on to the recommendation by itself
             shot(page, "03-scan")
-            see.click()
-            expect(bar.filter(has_text="Build a plan for")).to_be_visible(timeout=900000)
+            if see.is_visible():
+                see.click()
+            expect(build).to_be_visible(timeout=900000)
             shot(page, "04-markets")
             w["city_name"] = bar.inner_text().replace("Build a plan for", "").strip()
             if recorded:
@@ -104,6 +107,12 @@ def walk(base: str, brand: str, out: Path, demo: bool, start: str = "entry") -> 
             bar.click()
             page.wait_for_url(re.compile(r"/plan/[a-z-]+$"), timeout=60000)
             w["city_id"] = page.url.rstrip("/").rsplit("/", 1)[1]
+            for _ in range(60):  # Markets opens the plan first, then records the beachhead; a reload before that loses it
+                if (api("/markets").get("beachhead") or {}).get("city_id") == w["city_id"]:
+                    break
+                page.wait_for_timeout(1000)
+            else:
+                raise AssertionError("the beachhead was never recorded")
             save()
 
         if at <= 3:  # plan: auto-plan (prebuilt for the top three) builds it; Prepare drafts what's missing, then signs off
@@ -136,6 +145,18 @@ def walk(base: str, brand: str, out: Path, demo: bool, start: str = "entry") -> 
                 page.wait_for_timeout(5000)
             else:
                 raise AssertionError("the Launch page's background preparation didn't finish")
+            creator = next((it for it in api(f"/plans/{cid}/launch")["items"] if it["method"] == "creator"), None)
+            # sample creators (influencers.sample): a recording picks every one, last to first, so whichever a visitor
+            # picks replays; a replay picks the first, as the recording ended
+            opts = [o for o in (creator or {}).get("options") or [] if o.get("search")]
+            for o in (opts[:1] if demo else opts[::-1]):
+                ctx.request.post(f"{base}/api/projects/{pid}/plans/{cid}/launch/pick", data={
+                    "method": "creator", "lead_id": o["lead_id"], "search_id": o["search"]["id"], "index": o["search"]["index"]})
+                page.wait_for_timeout(2000)
+                for _ in range(120):
+                    if launch_ready(api, cid):
+                        break
+                    page.wait_for_timeout(3000)
             page.reload()
             lst.wait_for(timeout=120000)
             page.wait_for_timeout(3000)
@@ -198,7 +219,7 @@ def launch_ready(api, cid: str) -> bool:
     if not v.get("plan"):
         return False
     for it in v["items"]:
-        if it["preparing"]:
+        if it["preparing"] or (it.get("creators") or {}).get("searching"):
             return False
         if it["method"] == "digital" and not (it.get("variants") or it["failed"]):
             return False
@@ -232,7 +253,7 @@ def walk_of(pid: str) -> tuple[dict, list[str]]:
     pkgs = {x["id"]: delivery.package_view(pid, x["id"]) for it in v["items"] for x in it["packages"]}
     notes = [f"{x['method']}: {x['partner'].get('name')} was found by Influencers.club, which the demo never replays"
              for x in pkgs.values() if (x.get("partner") or {}).get("lead_id")
-             and (db.get_record(x["partner"]["lead_id"]) or {}).get("found_by")]
+             and ((db.get_record(x["partner"]["lead_id"]) or {}).get("found_by") or {}).get("origin") not in (None, "SYNTHETIC")]
     return {"city_id": cid, "city_name": markets.CITIES[cid]["name"], "methods": methods, "picks": picks_of(v["items"], pkgs)}, notes
 
 
@@ -312,7 +333,9 @@ if __name__ == "__main__":
     if cmd == "walk":
         base, brand, out = sys.argv[2], sys.argv[3], Path(sys.argv[4])
         frm = sys.argv[sys.argv.index("--from") + 1] if "--from" in sys.argv else "entry"
-        print(json.dumps(walk(base, brand, out, "--demo" in sys.argv, frm), indent=1))
+        w = walk(base, brand, out, "--demo" in sys.argv, frm)
+        print(json.dumps(w, indent=1))
+        sys.exit(1 if w.get("page_errors") else 0)
     elif cmd == "package":  # package <brand> <walk_dir> | package --from-project <pid> --db <path> --out <dir>
         from landfall import config
         opt = lambda n: sys.argv[sys.argv.index(n) + 1] if n in sys.argv else None  # noqa: E731

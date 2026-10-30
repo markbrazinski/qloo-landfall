@@ -39,10 +39,14 @@ coverage/
 .vscode/
 *.swp
 
-# Kept out of the repository by owner instruction (24 Oct 2026)
+# Working documents, design handoff and agent instructions kept outside the repository
 design/
-docs/
-live-captures-private/
+docs/*
+!docs/images/
+!docs/SETUP.md
+AGENTS.md
+CLAUDE.md
+maint.mk
 
 # Local runtime and build output
 .landfall/
@@ -53,5 +57,6 @@ web/node_modules/
 *.lock.lck
 live-captures-private/usage-ledger.lock
 
-# Recorded demo cases (owner, 28 Oct 2026): kept locally, not in git until a curated set is chosen at the end
+# Recorded runs (third-party pages and provider responses): kept with each deployment, never committed
 fixtures/demo/
+fixtures/golden/

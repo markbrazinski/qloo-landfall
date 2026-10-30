@@ -2,7 +2,7 @@
 name = "landfall"
 version = "0.1.0"
 description = "Your international launch team. Find where your brand belongs worldwide."
-license = "MIT"
+license = "Apache-2.0"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "fastapi>=0.115",

@@ -105,8 +105,11 @@ async def access_submit(request: Request):
 
 @app.get("/api/session")
 def session_view(request: Request):
-    """This browser's track; never the session or link id."""
-    return {"track": grants.track(request.state.session), "grant_kind": grants.kind_of(request.state.session)}
+    """This browser's track and the recorded runs on this machine (a fresh clone has only Tidewell); never the session
+    or link id."""
+    cases = [k for k, d in DEMO_CASES.items() if k != "tidewell" and (d / "case.json").exists()] or ["tidewell"]
+    return {"track": grants.track(request.state.session), "grant_kind": grants.kind_of(request.state.session),
+            "demo_cases": cases}
 
 
 @app.exception_handler(runner.NotAllowed)
@@ -1760,8 +1763,8 @@ def _goal_view(pid: str, ident: dict, prof: dict | None) -> dict | None:
             "catalog": sorted(({"city_id": c, "name": markets.CITIES[c]["name"]} for c in markets.ORDER), key=lambda c: c["name"])}
 
 
-DEMO_ENDS = ("The recorded demo ends here: it has no recorded Qloo data for Tidewell, so Markets, Plan, Prepare and Act & adapt "
-             "run only as live research, which is open to judges through the link they were given.")
+DEMO_ENDS = ("Tidewell's recording covers the Brand stage. Markets, Plan and Launch run as live research with your own Qloo "
+             "and AWS keys (see the README).")
 
 
 def _markets_reason(ident: dict, prof: dict | None) -> str:

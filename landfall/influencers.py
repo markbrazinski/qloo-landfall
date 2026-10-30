@@ -66,12 +66,17 @@ def _demo(pid: str) -> bool:
     return db.q("SELECT mode FROM projects WHERE id=?", pid)[0]["mode"] == "replay"
 
 
+def sample(pid: str) -> bool:
+    """Owner, 29 Oct 2026: a real brand's recorded demo shows sample creators, since Influencers.club data is never
+    recorded or replayed (their terms). The server recording one runs with LANDFALL_SAMPLE_CREATORS=on, so the
+    recording and its replay pick from the same sample creators."""
+    case = db.q("SELECT demo_case FROM projects WHERE id=?", pid)[0]["demo_case"] or ""
+    return config.env("LANDFALL_SAMPLE_CREATORS") == "on" or "/fixtures/demo/" in case
+
+
 def unavailable(pid: str) -> str | None:
     """Why live discovery can't run for this project now, or None."""
-    if _demo(pid):
-        if "/fixtures/demo/" in (db.q("SELECT demo_case FROM projects WHERE id=?", pid)[0]["demo_case"] or ""):
-            # owner, 28 Oct 2026: a real brand's recorded demo never records or replays Influencers.club data (their terms)
-            return "Creator search with Influencers.club isn't part of the recorded demo."
+    if _demo(pid) or sample(pid):
         return None  # SYNTHETIC creators; a recorded exchange skips this check in _dispatch [P66-I1]
     if not _key():
         return "Creator discovery isn't connected in this deployment."
@@ -184,7 +189,7 @@ def _affordable(pool: str, pid: str, requests: int, credits: float) -> bool:
 
 def costs(pid: str, pool: str, platform: str = "instagram") -> dict:
     """What each action would send now and whether the allowance admits it [P66-I7]; a demo sends nothing."""
-    demo = _demo(pid)
+    demo = _demo(pid) or sample(pid)
     cached = bool(db.q("SELECT 1 FROM provider_cache WHERE key=?", f"ic_location:{platform}:"
                        f"{((db.latest('shortlist', pid) or {}).get('beachhead') or {}).get('city_id')}"))
     out = {"search": (1 if cached else 2, LIMIT * RATE), "more": (1, LIMIT * RATE), "enrich": (1, ENRICH_CREDITS)}
@@ -226,9 +231,7 @@ def search(pid: str, city: str, session: str, platform: str = "instagram", follo
     try:
         ctx["phrase"], ctx["pins"] = _phrase(pid)
         fmin = max(FOLLOWER_MIN, follower_min or 0)
-        if _demo(pid):
-            if why := unavailable(pid):
-                raise Refused(503, why)
+        if _demo(pid) or sample(pid):
             loc, origin, out = markets.CITIES[city]["name"], "SYNTHETIC", _synthetic(page)
             ctx["sent"] = _request(platform, loc, ctx["phrase"], fmin, page)
         else:
@@ -364,8 +367,9 @@ def enrich(pid: str, lead_id: str, session: str) -> dict:
                "body": {"handle": lead["creator"]["handle"].lstrip("@"), "platform": lead["found_by"]["platform"],
                         "email_required": "preferred"}}
     base = {"lead_id": lead_id, "lead_key": lead["key"], "pool": pool, "request": request}
-    if _demo(pid):
-        out, origin = {"status": 200, "body": {"result": {"email": None, "email_status": "no_email"}}}, "SYNTHETIC"
+    if _demo(pid) or sample(pid):  # a sample creator's address is a placeholder on a reserved domain; nothing is sent
+        email = f"{lead['creator']['handle'].lstrip('@')}@example.com" if sample(pid) else None
+        out, origin = {"status": 200, "body": {"result": {"email": email, "email_status": "sample" if email else "no_email"}}}, "SYNTHETIC"
     else:
         try:
             out, origin = _dispatch(pid, pool, "enrich", request, ENRICH_CREDITS,

@@ -17,8 +17,11 @@ build() {  # <commit> <out.tgz>
   git -C "$ROOT" archive "$sha" | tar -x -C "$work"
   (cd "$work/web" && npm ci --no-audit --no-fund --loglevel=error && npm run build >/dev/null)
   rm -rf "$work/web/node_modules"
+  # The recorded demo cases are kept out of git (private captures, .gitignore) but the demo track replays them.
+  if [ -d "$ROOT/fixtures/demo" ]; then cp -R "$ROOT/fixtures/demo" "$work/fixtures/demo"
+  else echo "WARNING: fixtures/demo missing here; the demo track will fail on the server" >&2; fi
   echo "$sha" > "$work/RELEASE"
-  tar -czf "$2" -C "$work" .
+  COPYFILE_DISABLE=1 tar --no-xattrs -czf "$2" -C "$work" .  # no macOS metadata (GNU tar warns on it)
   rm -rf "$work"
   echo "built $sha → $2 ($(du -h "$2" | cut -f1))"
 }

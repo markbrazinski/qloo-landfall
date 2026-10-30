@@ -27,7 +27,7 @@ def env(name: str, default: str | None = None) -> str | None:
     return _ENV.get(name, default)
 
 
-AWS_PROFILE = env("AWS_PROFILE", "landfall")
+AWS_PROFILE = env("AWS_PROFILE") or None  # unset or empty: boto3's normal credential chain
 AWS_REGION = env("AWS_REGION", "us-east-1")
 NOVA_MODEL = env("LANDFALL_NOVA_MODEL", "us.amazon.nova-2-lite-v1:0")
 # Slice 6 copy writer and its sentence check (owner, 26 Oct 2026: "a better model" for ad copy). Checked 26 Oct 2026:
@@ -47,7 +47,7 @@ CAP_FETCH = int(env("LANDFALL_CAP_FETCH", "3000"))
 # Gemini mockup scenes (owner, 27 Oct 2026: "add budget of 15 dollars"): its own cap, not §8.1's expiry.
 CAP_GEMINI_USD = float(env("LANDFALL_CAP_GEMINI_USD", "15"))
 QLOO_FLOOR = int(env("LANDFALL_QLOO_FLOOR", "1000"))
-EXPIRES = datetime.fromisoformat(env("LANDFALL_AUTHORITY_EXPIRES", "2026-10-30T23:59:00-07:00"))
+EXPIRES = datetime.fromisoformat(env("LANDFALL_AUTHORITY_EXPIRES")) if env("LANDFALL_AUTHORITY_EXPIRES") else None  # unset: no expiry
 
 # record | live | replay. Tests and the demo force replay.
 PROVIDER_MODE = env("LANDFALL_PROVIDER_MODE", "record")

@@ -1,7 +1,7 @@
 import "./act.css";
 import "./prepare.css";
 import "./launch.css";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { type DestinationState, type KitMockup, type LaunchItem, type LaunchOption, type LaunchSettings, type Package, type Segment,
   api6, api65, apiLaunch, sharedOf, useLive, useProject } from "./api";
 import { historyOf } from "./ActAdapt";
@@ -79,7 +79,8 @@ export default function LaunchPage({ id, city }: { id: string; city: string }) {
   const rows = v.items.map((it) => ({ it, pk: it.packages.map((x) => pkgs[x.id]).find(Boolean) }));
   // owner, 28 Oct 2026: once an ad is picked, it is the picture everywhere on the page (and it goes with every email)
   const ads = rows.find(({ it }) => it.method === "digital");
-  const pickedAd: PickedAd | null = ads && ads.it.picked != null ? (() => {
+  const adScene = kit.find((m) => m.method === "digital");
+  const pickedAd: PickedAd | null = ads && ads.it.picked != null && adScene && !["QUEUED", "GENERATING"].includes(adScene.state) ? (() => {
     const d = adMock(id, ads.it, ads.pk, kit.find((m) => m.method === "digital"));
     return { kind: AD_KINDS[ads.it.picked!] || "ad1", d: ads.it.picked === 2 ? { ...d, scene: null } : d };
   })() : null;
@@ -175,6 +176,7 @@ function Item({ n, id, city, it, pk, mock, pickedAd, reload, drawers }: {
   const [err, setErr] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const li = useRef<HTMLLIElement>(null);
   const d = pk?.destination_states[0];
   const act = async (label: string, fn: () => Promise<unknown>, after?: string) => {
     setBusy(label); setErr(null); setNote(null);
@@ -190,6 +192,16 @@ function Item({ n, id, city, it, pk, mock, pickedAd, reload, drawers }: {
   const needs = pk && d ? [...(noAddress ? [{ field: "to", text: "Their email address", short: "an email address" }] : []),
     ...needsOf(d).filter((m) => m.field !== "to")] : [];
   const finished = isDone(d);
+  // owner, 29 Oct 2026: a signed-off item folds away; bring the founder along to the next one instead of leaving them
+  // looking at whatever moved up under them
+  const was = useRef(finished);
+  useEffect(() => {
+    if (finished && !was.current) {
+      const next = li.current?.nextElementSibling as HTMLElement | null;
+      requestAnimationFrame(() => (next || li.current)?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    }
+    was.current = finished;
+  }, [finished]);
   const cap = d && capOf(d);
   const runnable = !!d && (d.next.includes("approve") || d.next.includes("execute"));
   const body = pk?.email ? `Subject: ${pk.email.subject}\n\n${pk.email.body}` : "";
@@ -251,12 +263,12 @@ function Item({ n, id, city, it, pk, mock, pickedAd, reload, drawers }: {
     </div>
   );
   if (finished && !open) return (
-    <li className="launch-item done">{head}
+    <li ref={li} className="launch-item done">{head}
       <div className="launch-done-row"><button type="button" className="link" onClick={() => setOpen(true)}>Show what went out</button>
         {pk && <Link className="link" to={`/p/${id}/deliver/${pk.id}`}>Full record</Link>}</div></li>);
 
   return (
-    <li className={`launch-item ${status.tone}`}>
+    <li ref={li} className={`launch-item ${status.tone}`}>
       {head}
       {!digital && <Recipient id={id} city={city} it={it} pk={pk} busy={!!busy || finished} act={act} />}
       {digital ? <Ads id={id} it={it} pk={pk} mock={mock} busy={!!busy || finished} act={act} />
@@ -322,7 +334,7 @@ function Recipient({ id, city, it, pk, busy, act }: { id: string; city: string; 
       {opts.length === 0 && !c?.searching && <p className="small">Nobody Landfall can contact yet: no creator here has an email address or a confirmed profile.</p>}
       <ul className="plain launch-creator-list">{shown.map((o) => {
         const on = cur === o.key;
-        return <li key={o.key} className={`launch-creator ${on ? "on" : ""}`}>
+        return <li key={o.key} className={`launch-creator ${on || pending === o.key ? "on" : ""}`}>
           <span className="launch-creator-name"><b>{o.name}</b> <a className="source-url" href={o.route.kind === "profile" ? o.route.value : `${o.route.kind === "phone" ? "tel" : "mailto"}:${o.route.value}`} target="_blank" rel="noreferrer noopener">
             {o.route.kind === "profile" ? o.route.value.replace(/^https:\/\/(www\.)?/, "") : o.route.value}</a></span>
           <span className="small steel">{[o.followers != null && `${o.followers.toLocaleString()} followers`, o.engagement_percent != null && `${o.engagement_percent}% engagement`,
@@ -371,16 +383,20 @@ function Ads({ id, it, pk, mock, busy, act }: { id: string; it: LaunchItem; pk?:
   // the ads show as soon as their copy is written, before the campaign exists (owner, 28 Oct 2026: "the ads are the first thing")
   const base = adMock(id, it, pk, mock);
   const vs = it.variants;
+  // owner, 29 Oct 2026: never show the stand-in colors while the Qloo-styled scene is still being made; it looked broken
+  const making = !mock || mock.state === "QUEUED" || mock.state === "GENERATING";
   const b = pk?.budget_view;
   return (
     <div className="stack" style={{ gap: 12 }}>
       {styled}
+      {making && <p className="small steel" role="status">Making the ad images from your Qloo taste…</p>}
       <div className="launch-ads" role="radiogroup" aria-label="Pick the ad to run">
         {vs.map((x) => {
           const on = it.picked === x.index;
           return <button key={x.index} type="button" role="radio" aria-checked={on} className={`launch-ad ${on ? "on" : ""}`} disabled={busy || !pk}
             onClick={() => pk && act("pick-ad", () => api6.edit(id, pk.id, pk.version, { ad_pick: x.index }))}>
-            <div className="launch-ad-frame"><CampaignMockup kind={AD_KINDS[x.index] || "ad1"} d={{ ...base, scene: x.index === 2 ? null : base.scene }} /></div>
+            <div className="launch-ad-frame">{making ? <div className="launch-ad-loading" role="status" aria-label="Making this ad" />
+              : <CampaignMockup kind={AD_KINDS[x.index] || "ad1"} d={{ ...base, scene: x.index === 2 ? null : base.scene }} />}</div>
             <b>{x.headline}</b><span className="small steel">{x.description}</span>
             {x.to_check.length > 0 && <span className="small prep-question">△ To check: {x.to_check.join(" · ")}</span>}
             <span className="launch-ad-pick">{on ? "✓ This ad" : pk ? "Use this ad" : "Setting up the campaign…"}</span>

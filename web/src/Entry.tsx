@@ -17,6 +17,7 @@ const TEAM = [
 const DEMOS = [
   ["deathwishcoffee", "Death Wish Coffee", "deathwishcoffee.com · coffee"],
   ["untuckit", "UNTUCKit", "untuckit.com · shirts and apparel"],
+  ["tidewell", "Tidewell", "tidewell.example · sparkling tea · the brief only"],  // shown only where neither run above exists
 ] as const;
 
 export default function Entry() {
@@ -28,7 +29,10 @@ export default function Entry() {
   const idem = useMemo(() => crypto.randomUUID(), []);
   // A1 (owner, 27 Oct 2026): a judge or owner link gets live research; everyone else gets the recorded demo.
   const [track, setTrack] = useState<SessionTrack["track"] | null>(null);
-  useEffect(() => { sessionTrack().then((s) => setTrack(s.track), () => setTrack("live")); }, []);
+  const [cases, setCases] = useState<string[]>([DEMOS[0][0]]);  // the recorded runs this server has
+  useEffect(() => {
+    sessionTrack().then((s) => { setTrack(s.track); setCases(s.demo_cases); setDemoCase(s.demo_cases[0]); }, () => setTrack("live"));
+  }, []);
   const demo = track === "demo";
   const [demoCase, setDemoCase] = useState<string>(DEMOS[0][0]);
 
@@ -57,8 +61,10 @@ export default function Entry() {
           {track && <form className="lfb-intake-form" onSubmit={submit} noValidate>
             {demo
               ? <div className="stack" role="radiogroup" aria-label="Recorded demo">
-                <p className="lfb-intake-lede">Choose a brand. Each is a full recorded run, from the brief to Act &amp; adapt. Live research is open to judges through the link they were given.</p>
-                {DEMOS.map(([k, name, sub]) => (
+                <p className="lfb-intake-lede">{cases.includes("tidewell")
+                  ? "Choose a brand. Its recorded brand read replays here; live research runs with your own Qloo and AWS keys."
+                  : "Choose a brand. Each is a full recorded run, from the brief to Act & adapt. Live research is open to judges through the link they were given."}</p>
+                {DEMOS.filter(([k]) => cases.includes(k)).map(([k, name, sub]) => (
                   <label key={k} className={`prep-option ${demoCase === k ? "on" : ""}`}>
                     <input type="radio" name="demo-case" checked={demoCase === k} onChange={() => setDemoCase(k)} />
                     <span className="prep-option-body">

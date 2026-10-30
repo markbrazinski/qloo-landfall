@@ -153,7 +153,7 @@ def reserve(provider: str, operation: str, exposure_usd: float = 0.0, **fields) 
             g = totals()["gemini_usd"]
             if g + exposure_usd > config.CAP_GEMINI_USD:
                 raise BudgetExhausted(f"Gemini cap reached (${g:.4f} + ${exposure_usd:.4f} > ${config.CAP_GEMINI_USD:g})")
-        elif _now() > config.EXPIRES:
+        elif config.EXPIRES and _now() > config.EXPIRES:
             raise BudgetExhausted("live authority expired")
         t = totals()
         if provider == "bedrock" and t["usd"] - t["gemini_usd"] + exposure_usd > config.CAP_USD:

@@ -21,6 +21,7 @@ from urllib.parse import urlsplit
 import httpcore
 
 from . import brand, config, db, fetch, ledger, runner
+from .cassette import NoRecording
 from .runner import HANDLERS, Run
 
 VERSION = "products@1"
@@ -342,7 +343,11 @@ def read_feed(run: Run, pid: str, url: str, home: dict) -> dict:
     if not brand.robots_allows(run, furl):
         out["status"] = "REFUSED"
         return out
-    page = fetch.get(furl, run.cassette, STAGE_FEED)
+    try:
+        page = fetch.get(furl, run.cassette, STAGE_FEED)
+    except NoRecording:  # cases recorded before the limit rose to 250 (fixtures/demo/) asked for the 30 newest
+        out["url"] = furl = furl.replace(f"limit={FEED_LIMIT}", "limit=30")
+        page = fetch.get(furl, run.cassette, STAGE_FEED)
     out["sources"].append(fetch.check_url(furl))
     out["status"] = page.get("status") or page.get("error")
     items = shopify_items(page.get("body", "")) if page.get("status") == 200 else None

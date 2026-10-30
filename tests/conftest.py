@@ -1,4 +1,5 @@
 import ipaddress
+import os
 import socket
 import tempfile
 import threading
@@ -29,6 +30,12 @@ config.PRIVATE = _SESSION / "private"
 for _k in ("LANDFALL_SHARED_DELIVERY", "LANDFALL_REQUIRE_GRANT"):
     config._ENV.pop(_k, None)
 config.AUTO_PLAN = False  # the existing journeys drive research, investigation and the plan step by step
+# nor does the developer's AWS setup: boto3 sessions sign with dummy keys (the socket guard below stops any call)
+for _k in ("AWS_PROFILE", "AWS_SESSION_TOKEN"):
+    os.environ.pop(_k, None)
+os.environ.update(AWS_ACCESS_KEY_ID="LANDFALLTESTKEY", AWS_SECRET_ACCESS_KEY="landfall-tests-no-secret", AWS_CONFIG_FILE=os.devnull,
+                  AWS_SHARED_CREDENTIALS_FILE=os.devnull)
+config.AWS_PROFILE = None
 _connect, _connect_ex = socket.socket.connect, socket.socket.connect_ex
 
 

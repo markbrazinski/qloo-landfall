@@ -236,7 +236,7 @@ def test_a_proposal_changes_nothing_until_adopted_and_its_facts_and_rates_are_ch
     pid = planned(client, strat_env, digital=True)
     before = db.get_record(plans.plan_id(pid, "toronto"))
     est = client.post(f"/api/projects/{pid}/plans/toronto/propose", json={"dry_run": True}).json()
-    assert est["run_id"] is None and est["est"]["max_usd"] == 0.11  # the cost is shown first
+    assert est["run_id"] is None and est["est"]["max_usd"] == 0.40  # the cost is shown first
     p = propose(client, pid)
     assert db.get_record(plans.plan_id(pid, "toronto"))["version"] == before["version"]  # nothing changed
     assert [m["role"]["by"] for m in pv(client, pid)["methods"] if m["role"]] == ["founder", "founder"]

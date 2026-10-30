@@ -471,10 +471,16 @@ export function useLive<T>(id: string, loader: (id: string) => Promise<T>) {
       clearTimeout(timer);
       timer = window.setTimeout(load, 120);
     };
+    // owner, 29 Oct 2026 ("it was stuck, why did it need a refresh"): events sent while the stream was down (a server
+    // restart) are never replayed, so reload on every reconnect, and check every 15 s in case one is missed anyway
+    let opened = false;
+    es.onopen = () => { if (opened) load(); opened = true; };
+    const poll = window.setInterval(() => document.visibilityState === "visible" && load(), 15000);
     return () => {
       alive = false;
       es.close();
       clearTimeout(timer);
+      clearInterval(poll);
     };
   }, [id]);
 
@@ -744,7 +750,7 @@ export const sharedOf = (d: DestinationState) => (d as DestinationState & { shar
 
 // ---- access tracks (DEPLOYMENT-PLAN A1) ----
 /** This browser's track: "live" for a judge or owner link (or local development), "demo" for the recorded demo. */
-export type SessionTrack = { track: "live" | "demo"; grant_kind: "judge" | "owner" | null };
+export type SessionTrack = { track: "live" | "demo"; grant_kind: "judge" | "owner" | null; demo_cases: string[] };
 export const sessionTrack = () => call<SessionTrack>("/api/session");
 
 // ---- Launch (owner, 28 Oct 2026): one checklist, one sign-off per item (landfall/delivery.py launch_view) ----

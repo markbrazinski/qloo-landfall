@@ -58,7 +58,9 @@ aws iam put-role-policy --role-name landfall-runtime --policy-name landfall-runt
  \"Version\":\"2012-10-17\",\"Statement\":[
   {\"Effect\":\"Allow\",\"Action\":\"bedrock:InvokeModel\",\"Resource\":[
     \"arn:aws:bedrock:us-east-1:$ACCT:inference-profile/us.amazon.nova-2-lite-v1:0\",
-    \"arn:aws:bedrock:*::foundation-model/amazon.nova-2-lite-v1:0\"]},
+    \"arn:aws:bedrock:*::foundation-model/amazon.nova-2-lite-v1:0\",
+    \"arn:aws:bedrock:us-east-1:$ACCT:inference-profile/us.amazon.nova-pro-v1:0\",
+    \"arn:aws:bedrock:*::foundation-model/amazon.nova-pro-v1:0\"]},
   {\"Effect\":\"Allow\",\"Action\":\"bedrock:InvokeTool\",\"Resource\":\"arn:aws:bedrock::$ACCT:system-tool/amazon.nova_grounding\"},
   {\"Effect\":\"Allow\",\"Action\":[\"ssm:GetParameters\",\"ssm:GetParametersByPath\"],\"Resource\":[
     \"arn:aws:ssm:us-east-1:$ACCT:parameter/landfall/judging/*\",\"arn:aws:ssm:us-east-1:$ACCT:parameter/landfall/judging\"]},
@@ -137,9 +139,10 @@ LANDFALL_ENV=judging
 LANDFALL_PROVIDER_MODE=live
 LANDFALL_DB=/srv/landfall/data/landfall.db
 LANDFALL_LEDGER=/srv/landfall/data/ledger.jsonl
-LANDFALL_CAP_USD=45
-LANDFALL_CAP_QLOO=31000
-LANDFALL_CAP_FETCH=6000
+LANDFALL_CAP_USD=30
+LANDFALL_CAP_QLOO=30000
+LANDFALL_CAP_FETCH=4500
+LANDFALL_REQUIRE_GRANT=on
 LANDFALL_QLOO_FLOOR=1000
 LANDFALL_AUTHORITY_EXPIRES=2099-12-31T23:59:00-08:00
 LANDFALL_ENABLE_YOUTUBE=1

@@ -74,3 +74,9 @@
 }
 /* one-line labels so every input lines up (owner, 28 Oct 2026) */
 .launch-field > .label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* an ad whose Qloo-styled scene is still being made (owner, 29 Oct 2026) */
+.launch-ad-loading { aspect-ratio: 9 / 16; width: 100%; border-radius: 8px; background: linear-gradient(100deg, var(--lf-fog) 30%, var(--lf-surface) 50%, var(--lf-fog) 70%);
+  background-size: 300% 100%; animation: launch-ad-shimmer 1.4s ease-in-out infinite; }
+@keyframes launch-ad-shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+@media (prefers-reduced-motion: reduce) { .launch-ad-loading { animation: none; } }
