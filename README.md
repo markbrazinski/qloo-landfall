@@ -167,7 +167,7 @@ Open [http://localhost:8000](http://localhost:8000) and enter any brand's websit
   replayed later.
 
 Optional providers (mockup images with Gemini, creator discovery with Influencers.club, YouTube, and delivery through
-Gmail, Google Ads, Meta and TikTok) are listed with every setting in [docs/SETUP.md](docs/SETUP.md).
+Gmail and Google Ads) are listed with every setting in [docs/SETUP.md](docs/SETUP.md).
 
 ### Troubleshooting
 
@@ -211,8 +211,7 @@ secrets in SSM Parameter Store (about US$0.58 a day).
 - **React 19.3.1**, **Vite 7.3.7** and **TypeScript 5.9.3** for the web app; **d3-geo 3.1.1**,
   **topojson-client 3.1.0** and **world-atlas 2.0.2** draw the world map.
 - **pytest 9.1.1** and **pytest-asyncio 1.4.0** for the test suite.
-- Optional: Gemini image generation, Influencers.club, the YouTube Data API, the Gmail API, the Google Ads API, the Meta
-  Marketing API and the TikTok API for Business.
+- Optional: Gemini image generation, Influencers.club, the YouTube Data API, the Gmail API and the Google Ads API.
 
 ## Repository structure
 
@@ -223,7 +222,7 @@ landfall/             API (app.py), task runner, ledger, record/replay boundary 
   scan.py ranking.py  the 80-city Qloo scan and the deterministic ranking
   research.py         city research; specialist.py: retail, pop-up, creator, community and digital leads
   strategist.py       plan proposals; plans.py estimates.py money.py: cost lines, budgets and FX
-  delivery.py         launch kit, sign-off and delivery; adapters/: Gmail, Google Ads, Meta, TikTok
+  delivery.py         launch kit, sign-off and delivery; adapters/: Gmail, Google Ads
   mockups.py          ad and shelf mockup images
   data/               80-city catalog, countries, gazetteer, platforms, templates, fonts
 web/src/              React app: Entry, Brand, Markets, Plan, Launch and delivery pages
