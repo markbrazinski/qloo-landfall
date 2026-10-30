@@ -49,6 +49,7 @@ export default function BrandPage({ id }: { id: string }) {
   const [notice, setNotice] = useState<string | null>(null);
   const [exploreErr, setExploreErr] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [busy, setBusy] = useState(false);  // the click waits on two round trips before Markets opens
   const sawReading = useRef(false);
   const retried = useRef(false);
 
@@ -92,6 +93,7 @@ export default function BrandPage({ id }: { id: string }) {
   /** v4: identity and profile are never a blocking confirmation. Explore settles what Markets needs, then scans. */
   async function explore() {
     setExploreErr(null);
+    setBusy(true);
     try {
       // fresh, not the last poll: Markets may have started by themselves a moment ago (owner, 28 Oct 2026)
       const q = await api.project(latest.current!.id).catch(() => latest.current!);
@@ -118,6 +120,8 @@ export default function BrandPage({ id }: { id: string }) {
       setExploreErr(`${q.markets_reason} Use Adjust on the Qloo card.`);
     } catch (x) {
       setExploreErr((x as Error).message);
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -128,7 +132,7 @@ export default function BrandPage({ id }: { id: string }) {
         <DecisionBar kicker={`BRAND · YOUR BRIEF V${brief.version}`} title={`Here's what we understand about ${name}`}
           subtitle="Correct anything important. Nothing else is needed to start: next, the Market scout looks across 80 cities."
           primary={p.demo && p.identity.status === "failed" ? { label: "Explore markets", disabledReason: p.markets_reason }  // the recorded demo ends here
-            : { label: "Explore markets", onClick: explore }} />
+            : { label: busy ? "Starting…" : "Explore markets", onClick: explore, busy }} />
         <div className="page lfb-brief">
           {pending && <p className="small steel" role="status">Asking Qloo about {name}; Markets opens as soon as it answers.</p>}
           {exploreErr && <p className="field-error" role="alert">{exploreErr}</p>}

@@ -177,7 +177,17 @@ def test_browser_goal_presence_ranking_recommendations_all80_update(server):
         # v4 03 dropped the per-audience Remove control (and so the check that a removed audience isn't used downstream)
         page.screenshot(path=SHOTS / "brief-presence-audience.png", full_page=True)
 
+        # the click waits on two round trips: the button says so, and can't be pressed twice (owner, 30 Oct 2026)
+        held = []
+        page.route(re.compile(r".*/scan$"), lambda route: held.append(route))
         page.get_by_role("button", name="Explore markets").click()
+        starting = page.get_by_role("button", name="Starting…")
+        starting.wait_for(timeout=10000)
+        assert starting.is_disabled()
+        while not held:
+            page.wait_for_timeout(50)
+        held[0].continue_()
+        page.unroute(re.compile(r".*/scan$"))
         page.wait_for_url(re.compile(r"/markets/scan$"), timeout=10000)
         page.get_by_role("button", name="See recommended markets").wait_for(timeout=60000)
         assert page.locator(".map-dot").count() == 80

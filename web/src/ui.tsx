@@ -124,7 +124,7 @@ export function StageNav({ stages, current }: { stages: Stage[]; current: number
 
 // ---- LF-DecisionBar ----
 export function DecisionBar(props: {
-  kicker: string; title: string; subtitle?: ReactNode; primary?: { label: string; onClick?: () => void; disabledReason?: string };
+  kicker: string; title: string; subtitle?: ReactNode; primary?: { label: string; onClick?: () => void; disabledReason?: string; busy?: boolean };
   secondary?: ReactNode;
 }) {
   const p = props.primary;
@@ -140,7 +140,7 @@ export function DecisionBar(props: {
         {p && (
           <div className="primary-wrap">
             <button type="button" className={p.disabledReason ? "btn-disabled" : "btn-primary"} onClick={p.onClick}
-                    disabled={!!p.disabledReason} aria-describedby={p.disabledReason ? "primary-reason" : undefined}>
+                    disabled={!!p.disabledReason || p.busy} aria-busy={p.busy || undefined} aria-describedby={p.disabledReason ? "primary-reason" : undefined}>
               {p.label}
             </button>
             {p.disabledReason && <div id="primary-reason" className="reason">{p.disabledReason}</div>}
