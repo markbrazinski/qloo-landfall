@@ -455,27 +455,22 @@ def test_browser_markets_start_and_move_on_by_themselves(server, monkeypatch):
         browser.close()
 
 
+
 @pytest.mark.skipif(not (config.ROOT / "fixtures" / "demo" / "deathwishcoffee" / "case.json").exists(),
                     reason="recorded demo cases not present (private)")
-def test_browser_a_live_session_can_start_live_or_a_recorded_run(server):
-    """Owner, 30 Oct 2026: a judge (live track) chooses any brand live, with one-click example sites, or a recorded run."""
+def test_browser_a_live_session_gets_one_click_example_sites(server):
+    """Owner, 30 Oct 2026: a judge (live track) sees the website field with the recorded brands' sites as one-click fills."""
     from playwright.sync_api import expect, sync_playwright
     base = server()
     with sync_playwright() as pw:
         browser = pw.chromium.launch()
         page = browser.new_page()
         page.goto(base + "/")
-        expect(page.get_by_role("radio", name=re.compile("Any brand, live"))).to_be_checked()
+        expect(page.get_by_role("radio")).to_have_count(0)
+        page.get_by_role("button", name="untuckit.com").click()
+        expect(page.get_by_label("Your brand's website")).to_have_value("untuckit.com")
         page.get_by_role("button", name="deathwishcoffee.com").click()
         expect(page.get_by_label("Your brand's website")).to_have_value("deathwishcoffee.com")
         expect(page.get_by_role("button", name="Start exploring")).to_be_visible()
-        page.screenshot(path=SHOTS / "entry-live-or-recorded.png")
-
-        page.get_by_role("radio", name=re.compile("Death Wish Coffee")).check()
-        expect(page.get_by_label("Your brand's website")).to_have_count(0)
-        page.get_by_role("button", name="Start the demo").click()
-        page.wait_for_url(re.compile(r"/p/prj_"), timeout=10000)
-        pid = page.url.split("/p/")[1].split("/")[0]
-        p = db.q("SELECT mode, url, demo_case FROM projects WHERE id=?", pid)[0]
-        assert p["mode"] == "replay" and "deathwishcoffee" in p["url"] and p["demo_case"].endswith("deathwishcoffee")
+        page.screenshot(path=SHOTS / "entry-example-sites.png")
         browser.close()
