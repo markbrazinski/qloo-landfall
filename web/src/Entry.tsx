@@ -35,14 +35,18 @@ export default function Entry() {
   }, []);
   const demo = track === "demo";
   const [demoCase, setDemoCase] = useState<string>(DEMOS[0][0]);
+  // Owner, 30 Oct 2026: a judge needn't start blind: "live" (any site) or one of the recorded runs.
+  const [choice, setChoice] = useState<string>("live");
+  const replay = demo || choice !== "live";
+  const recorded = DEMOS.filter(([k]) => k !== "tidewell" && cases.includes(k));
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!demo && !url.trim()) return setError("Enter your brand’s website to start.");
+    if (!replay && !url.trim()) return setError("Enter your brand’s website to start.");
     setBusy(true);
     setError(null);
     try {
-      const target = demo ? { demo: true, demo_case: demoCase } : { url };
+      const target = replay ? { demo: true, demo_case: demo ? demoCase : choice } : { url };
       const { project_id } = await api.create({ ...target, ...goal, ...(ceiling ? { ceiling_usd: ceiling } : {}) }, idem);
       window.location.assign(`/p/${project_id}`);
     } catch (x) {
@@ -75,18 +79,40 @@ export default function Entry() {
                   </label>
                 ))}
               </div>
-              : <label className="lfb-url">
-                <span>Your brand's website</span>
-                <input id="url" placeholder="yourbrand.com" value={url} autoComplete="url" onChange={(e) => setUrl(e.target.value)}
-                  aria-invalid={!!error} aria-describedby={error ? "url-error" : undefined} />
-              </label>}
+              : <div className="stack" role="radiogroup" aria-label="Start with">
+                {recorded.length > 0 && <label className={`prep-option ${choice === "live" ? "on" : ""}`}>
+                  <input type="radio" name="start" checked={choice === "live"} onChange={() => setChoice("live")} />
+                  <span className="prep-option-body">
+                    <span className="prep-option-name"><b>Any brand, live</b><span className="chip chip-running">LIVE</span></span>
+                    <span className="steel">Live research on the website you enter.</span>
+                  </span>
+                </label>}
+                {choice === "live" && <label className="lfb-url">
+                  <span>Your brand's website</span>
+                  <input id="url" placeholder="yourbrand.com" value={url} autoComplete="url" onChange={(e) => setUrl(e.target.value)}
+                    aria-invalid={!!error} aria-describedby={error ? "url-error" : undefined} />
+                  {recorded.length > 0 && <span className="small steel">Try {recorded.map(([k, , sub], i) => (
+                    <span key={k}>{i > 0 && " or "}<button type="button" className="link" onClick={() => setUrl(sub.split(" ")[0])}>{sub.split(" ")[0]}</button></span>
+                  ))}.</span>}
+                </label>}
+                {recorded.map(([k, name, sub]) => (
+                  <label key={k} className={`prep-option ${choice === k ? "on" : ""}`}>
+                    <input type="radio" name="start" checked={choice === k} onChange={() => setChoice(k)} />
+                    <span className="prep-option-body">
+                      <span className="prep-option-name"><b>{name}</b><span className="chip chip-proposal">RECORDED</span></span>
+                      <span className="steel">{sub}</span>
+                      <span className="mono steel">A full recorded run, from the brief to Act & adapt · instant, nothing live</span>
+                    </span>
+                  </label>
+                ))}
+              </div>}
             {error && <p id="url-error" className="field-error" role="alert">{error}</p>}
-            {demo  // the recordings ran with the default goal; a replay can only follow it
+            {replay  // the recordings ran with the default goal; a replay can only follow it
               ? <p className="lfb-sentence">I'd like to expand {SCOPES[0][1]} to {PURPOSES[0][1]} with a starting budget of {usd(10000)}.</p>
               : <GoalSentence scope={goal.scope} purpose={goal.purpose} onChange={(c) => setGoal({ ...goal, ...c })}
                 ceiling={ceiling ?? 10000} onCeiling={setCeiling} />}
-            <button type="submit" className="btn-primary btn-block" disabled={busy}>{busy ? "Starting…" : demo ? "Start the demo" : "Start exploring"}</button>
-            <span className="mono steel">{demo ? "Replayed from a recording: no live calls, nothing goes out." : "We read public pages only. Nothing goes out until you approve it."}</span>
+            <button type="submit" className="btn-primary btn-block" disabled={busy}>{busy ? "Starting…" : replay ? "Start the demo" : "Start exploring"}</button>
+            <span className="mono steel">{replay ? "Replayed from a recording: no live calls, nothing goes out." : "We read public pages only. Nothing goes out until you approve it."}</span>
           </form>}
         </section>
         <section className="lfb-intake-right">
